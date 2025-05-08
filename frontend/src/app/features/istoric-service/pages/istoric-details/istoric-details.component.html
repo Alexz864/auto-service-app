@@ -1,0 +1,231 @@
+<div class="container-fluid">
+  <div class="row mb-4">
+    <div class="col">
+      <h2>Detalii Istoric Service</h2>
+      <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a [routerLink]="['/istoric']">Istoric</a></li>
+          <li class="breadcrumb-item active">Detalii</li>
+        </ol>
+      </nav>
+    </div>
+    <div class="col-auto">
+      <div class="btn-group">
+        <a [routerLink]="['/istoric']" class="btn btn-secondary">
+          <i class="bi bi-arrow-left me-1"></i> Înapoi la Lista Istoric
+        </a>
+        <a *ngIf="appointment" [routerLink]="['/appointments', appointment.id]" class="btn btn-info">
+          <i class="bi bi-calendar me-1"></i> Vezi Programare
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="loading" class="d-flex justify-content-center my-5">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Se încarcă...</span>
+    </div>
+  </div>
+
+  <div *ngIf="!loading && istoric">
+    <div class="row">
+      <div class="col-md-4">
+        <div class="card mb-4">
+          <div class="card-header">
+            <h5 class="card-title mb-0">Informații Generale</h5>
+          </div>
+          <div class="card-body">
+            <div class="status-badge mb-3">
+              <span class="badge" [ngClass]="{
+                'bg-success': istoric.status === 'finalizat',
+                'bg-warning': istoric.status === 'in lucru'
+              }">
+                {{ istoric.status }}
+              </span>
+            </div>
+
+            <div class="info-group">
+              <label>Client:</label>
+              <p>{{ clientName }}</p>
+            </div>
+
+            <div class="info-group">
+              <label>Mașină:</label>
+              <p>{{ carDetails }}</p>
+            </div>
+
+            <div class="info-group" *ngIf="appointment">
+              <label>Data Programării:</label>
+              <p>{{ appointment.date | date:'dd.MM.yyyy' }}</p>
+            </div>
+
+            <div class="info-group" *ngIf="appointment">
+              <label>Interval Orar:</label>
+              <p>{{ appointment.date | date:'HH:mm' }} - {{ calculateFinishDate(appointment.date, appointment.time) | date:'HH:mm' }}</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="card mb-4" *ngIf="istoric.processingCar">
+          <div class="card-header">
+            <h5 class="card-title mb-0">Deviz Final</h5>
+          </div>
+          <div class="card-body">
+            <div class="mb-3">
+              <label class="form-label fw-bold">Piese Utilizate:</label>
+              <div class="table-responsive">
+                <table class="table table-sm">
+                  <thead>
+                    <tr>
+                      <th>Denumire</th>
+                      <th>Cantitate</th>
+                      <th class="text-end">Preț</th>
+                      <th class="text-end">Total</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr *ngFor="let part of usedParts">
+                      <td>{{ part.name }} ({{ part.code }})</td>
+                      <td>{{ part.quantity }}</td>
+                      <td class="text-end">{{ part.price | currency:'RON ' }}</td>
+                      <td class="text-end">{{ (part.price || 0) * (part.quantity || 0) | currency:'RON ' }}</td>
+                    </tr>
+                    <tr *ngIf="usedParts.length === 0">
+                      <td colspan="4" class="text-center">Nu există piese utilizate</td>
+                    </tr>
+                  </tbody>
+                  <tfoot>
+                    <tr>
+                      <th colspan="3">Total Piese</th>
+                      <th class="text-end">{{ calculateTotalParts() | currency:'RON ' }}</th>
+                    </tr>
+                  </tfoot>
+                </table>
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label fw-bold">Manoperă:</label>
+              <div class="table-responsive">
+                <table class="table table-sm">
+                  <thead>
+                    <tr>
+                      <th>Durată</th>
+                      <th class="text-end">Cost / Minut</th>
+                      <th class="text-end">Total</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>{{ istoric.processingCar.serviceTime || 0 }} minute</td>
+                      <td class="text-end">10 RON</td>
+                      <td class="text-end">{{ calculateServiceFee() | currency:'RON ' }}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <div class="total-general p-3 bg-light rounded">
+              <div class="d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Total General:</h5>
+                <h4 class="mb-0 text-primary">{{ calculateGeneralTotal() | currency:'RON ' }}</h4>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-8">
+        <div class="card mb-4" *ngIf="istoric.receiveCar">
+          <div class="card-header d-flex justify-content-between align-items-center">
+            <h5 class="card-title mb-0">Primire Mașină</h5>
+            <button class="btn btn-sm btn-outline-primary" *ngIf="!editingReceive" (click)="startEditReceive()">
+              <i class="bi bi-pencil me-1"></i> Editează
+            </button>
+          </div>
+          <div class="card-body">
+            <div *ngIf="editingReceive">
+              <app-car-receive-form
+                [receive]="istoric.receiveCar"
+                [appointmentId]="istoric.appointmentId"
+                [loading]="loadingReceive"
+                (formSubmit)="onReceiveCarUpdate($event)"
+              ></app-car-receive-form>
+
+              <div class="d-flex justify-content-end mt-3">
+                <button class="btn btn-secondary me-2" (click)="cancelEditReceive()">
+                  Anulează
+                </button>
+              </div>
+            </div>
+
+            <div *ngIf="!editingReceive">
+              <div class="mb-3">
+                <label class="form-label fw-bold">Probleme vizuale identificate:</label>
+                <p>{{ istoric.receiveCar.visualProblems }}</p>
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label fw-bold">Probleme raportate de client:</label>
+                <p>{{ istoric.receiveCar.clientReportedProblems }}</p>
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label fw-bold">Scopul vizitei:</label>
+                <p>{{ istoric.receiveCar.purpose }}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card" *ngIf="istoric.processingCar">
+          <div class="card-header d-flex justify-content-between align-items-center">
+            <h5 class="card-title mb-0">Procesare Mașină</h5>
+            <button class="btn btn-sm btn-outline-primary" *ngIf="!editingProcessing" (click)="startEditProcessing()">
+              <i class="bi bi-pencil me-1"></i> Editează
+            </button>
+          </div>
+          <div class="card-body">
+            <div *ngIf="editingProcessing">
+              <app-processing-car-form
+                [processing]="istoric.processingCar"
+                [appointmentId]="istoric.appointmentId"
+                [loading]="loadingProcessing"
+                (formSubmit)="onProcessingCarUpdate($event)"
+              ></app-processing-car-form>
+
+              <div class="d-flex justify-content-end mt-3">
+                <button class="btn btn-secondary me-2" (click)="cancelEditProcessing()">
+                  Anulează
+                </button>
+              </div>
+            </div>
+
+            <div *ngIf="!editingProcessing">
+              <div class="mb-3">
+                <label class="form-label fw-bold">Operațiuni efectuate:</label>
+                <p>{{ istoric.processingCar.operationsDone }}</p>
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label fw-bold">Probleme depistate:</label>
+                <p>{{ istoric.processingCar.foundProblems }}</p>
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label fw-bold">Probleme rezolvate:</label>
+                <p>{{ istoric.processingCar.solvedProblems }}</p>
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label fw-bold">Durata reparației:</label>
+                <p>{{ istoric.processingCar.serviceTime || 0 }} minute</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

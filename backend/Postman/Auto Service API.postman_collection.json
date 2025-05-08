@@ -1,0 +1,2168 @@
+{
+	"info": {
+		"_postman_id": "36dc50e7-1c4b-423c-8c62-a982e6760696",
+		"name": "Auto Service API",
+		"description": "This documentation describes all endpoints available in the Auto Service Management application API.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "40082538"
+	},
+	"item": [
+		{
+			"name": "Health Check",
+			"item": [
+				{
+					"name": "Health Check",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Verifică statusul răspunsului\r",
+									"pm.test(\"Status code is 200\", function() {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"// Verifică structura răspunsului\r",
+									"pm.test(\"Response has valid structure\", function() {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData).to.have.property('status');\r",
+									"    pm.expect(jsonData).to.have.property('message');\r",
+									"    pm.expect(jsonData.status).to.eql('ok');\r",
+									"});\r",
+									"\r",
+									"// Verifică timpul de răspuns\r",
+									"pm.test(\"Response time is acceptable\", function() {\r",
+									"    pm.expect(pm.response.responseTime).to.be.below(500);\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/health",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"health"
+							]
+						},
+						"description": "This endpoint makes an HTTP GET request to the specified URL to retrieve the health status. The response of this request is documented below as a JSON schema.\n\n``` json\n{\n  \"status\": \"ok\",\n  \"message\": \"API is running\"\n}\n\n ```"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Clients",
+			"item": [
+				{
+					"name": "Get All Clients",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Verifică statusul răspunsului\r",
+									"pm.test(\"Status code is 200\", function() {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"// Verifică dacă răspunsul este un array\r",
+									"pm.test(\"Response is an array\", function() {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    pm.expect(Array.isArray(jsonData)).to.be.true;\r",
+									"});\r",
+									"\r",
+									"// Dacă există clienți, verifică structura primului client\r",
+									"if (pm.response.json().length > 0) {\r",
+									"    pm.test(\"Client object has required properties\", function() {\r",
+									"        var firstClient = pm.response.json()[0];\r",
+									"        pm.expect(firstClient).to.have.property('id');\r",
+									"        pm.expect(firstClient).to.have.property('nume');\r",
+									"        pm.expect(firstClient).to.have.property('prenume');\r",
+									"        pm.expect(firstClient).to.have.property('email');\r",
+									"        pm.expect(firstClient).to.have.property('telefon');\r",
+									"        pm.expect(firstClient).to.have.property('activ');\r",
+									"    });\r",
+									"    \r",
+									"    // Salvează ID-ul primului client pentru teste ulterioare\r",
+									"    pm.environment.set(\"clientId\", pm.response.json()[0].id);\r",
+									"}"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/clients",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"clients"
+							]
+						},
+						"description": "### Get Clients\n\nThis endpoint makes an HTTP GET request to retrieve a list of clients.\n\n#### Request Body\n\nThis request does not require a request body.\n\n#### Response\n\nThe response will include an array of client objects, each containing details such as client ID, name, email, and contact number.\n\nExample response:\n\n```\n[\n    {\n        \"clientId\": \"123\",\n        \"name\": \"Client Name\",\n        \"email\": \"client@example.com\",\n        \"contactNumber\": \"123-456-7890\"\n    },\n    {\n        \"clientId\": \"456\",\n        \"name\": \"Another Client\",\n        \"email\": \"anotherclient@example.com\",\n        \"contactNumber\": \"987-654-3210\"\n    }\n]\n\n ```"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Client by Id",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Verifică statusul răspunsului\r",
+									"pm.test(\"Status code is 200\", function() {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"// Verifică structura clientului\r",
+									"pm.test(\"Client object has required properties\", function() {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData).to.have.property('id');\r",
+									"    pm.expect(jsonData).to.have.property('nume');\r",
+									"    pm.expect(jsonData).to.have.property('prenume');\r",
+									"    pm.expect(jsonData).to.have.property('email');\r",
+									"    pm.expect(jsonData).to.have.property('telefon');\r",
+									"    pm.expect(jsonData).to.have.property('activ');\r",
+									"});\r",
+									"\r",
+									"// Verifică dacă ID-ul clientului este corect\r",
+									"pm.test(\"Client ID is correct\", function() {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData.id).to.eql(parseInt(pm.environment.get(\"clientId\")));\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/clients/{{clientId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"clients",
+								"{{clientId}}"
+							]
+						},
+						"description": "# Get Client Details\n\nThis endpoint retrieves the details of a specific client.\n\n## Request\n\n### Request URL\n\n- `GET /api/clients/1`\n    \n\n## Response\n\nThe response for this request is a JSON object containing the details of the client. Below is a JSON schema representing the structure of the response:\n\n``` json\n{\n{\n  \"id\": 1,\n  \"nume\": \"Popescu\",\n  \"prenume\": \"Ion\",\n  \"email\": \"ion.popescu@example.com\",\n  \"telefon\": \"0722123456\",\n  \"activ\": true,\n  \"createdAt\": \"2024-01-15T00:00:00.000Z\",\n  \"updatedAt\": \"2024-01-15T00:00:00.000Z\"\n}\n\n ```"
+					},
+					"response": []
+				},
+				{
+					"name": "Create Cleint",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Verifică statusul răspunsului\r",
+									"pm.test(\"Status code is 201\", function() {\r",
+									"    pm.response.to.have.status(201);\r",
+									"});\r",
+									"\r",
+									"// Verifică structura clientului creat\r",
+									"pm.test(\"Created client has required properties\", function() {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData).to.have.property('id');\r",
+									"    pm.expect(jsonData).to.have.property('nume');\r",
+									"    pm.expect(jsonData).to.have.property('prenume');\r",
+									"    pm.expect(jsonData).to.have.property('email');\r",
+									"    pm.expect(jsonData).to.have.property('telefon');\r",
+									"    pm.expect(jsonData).to.have.property('activ');\r",
+									"});\r",
+									"\r",
+									"// Verifică dacă datele clientului sunt corecte\r",
+									"pm.test(\"Client data is correct\", function() {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData.nume).to.eql(\"Testulescu\");\r",
+									"    pm.expect(jsonData.prenume).to.eql(\"Test\");\r",
+									"    pm.expect(jsonData.email).to.eql(\"test.testulescu@example.com\");\r",
+									"    pm.expect(jsonData.telefon).to.eql(\"0711223344\");\r",
+									"});\r",
+									"\r",
+									"// Salvează ID-ul clientului creat pentru teste ulterioare\r",
+									"pm.environment.set(\"createdClientId\", pm.response.json().id);"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"nume\": \"Testulescu\",\r\n  \"prenume\": \"Test\",\r\n  \"email\": \"test.testulescu@example.com\",\r\n  \"telefon\": \"0711223344\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/clients",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"clients"
+							]
+						},
+						"description": "### Create New Client\n\nThis endpoint allows you to create a new client.\n\n#### Request Body\n\n- `nume` (string, required): The last name of the client.\n    \n- `prenume` (string, required): The first name of the client.\n    \n- `email` (string, required): The email address of the client.\n    \n- `telefon` (string, required): The phone number of the client.\n    \n\n#### Response\n\nThe response will be a JSON object conforming to the following schema:\n\n``` json\n{\n  \"id\": 3,\n  \"nume\": \"Testulescu\",\n  \"prenume\": \"Test\",\n  \"email\": \"test.testulescu@example.com\",\n  \"telefon\": \"0711223344\",\n  \"activ\": true,\n  \"createdAt\": \"2024-04-22T12:30:00.000Z\",\n  \"updatedAt\": \"2024-04-22T12:30:00.000Z\"\n}\n\n ```"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Client",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Verifică statusul răspunsului\r",
+									"pm.test(\"Status code is 200\", function() {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"// Verifică structura clientului actualizat\r",
+									"pm.test(\"Updated client has required properties\", function() {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData).to.have.property('id');\r",
+									"    pm.expect(jsonData).to.have.property('nume');\r",
+									"    pm.expect(jsonData).to.have.property('prenume');\r",
+									"    pm.expect(jsonData).to.have.property('email');\r",
+									"    pm.expect(jsonData).to.have.property('telefon');\r",
+									"});\r",
+									"\r",
+									"// Verifică dacă datele clientului sunt actualizate corect\r",
+									"pm.test(\"Client data is updated correctly\", function() {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData.id).to.eql(parseInt(pm.environment.get(\"createdClientId\")));\r",
+									"    pm.expect(jsonData.prenume).to.eql(\"Test-Actualizat\");\r",
+									"    pm.expect(jsonData.email).to.eql(\"test.actualizat@example.com\");\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"nume\": \"Testulescu\",\r\n  \"prenume\": \"Test-Actualizat\",\r\n  \"email\": \"test.actualizat@example.com\",\r\n  \"telefon\": \"0711223344\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/clients/{{createdClientId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"clients",
+								"{{createdClientId}}"
+							]
+						},
+						"description": "## Update Client Details\n\nThis API endpoint is used to update the details of a specific client.\n\n### Request\n\n- Method: PUT\n    \n- URL: `{{baseUrl}}/api/clients/{{createdClientId}}`\n    \n\n#### Request Body\n\n- Type: JSON\n    \n    - `nume`: (string) The updated last name of the client.\n        \n    - `prenume`: (string) The updated first name of the client.\n        \n    - `email`: (string) The updated email address of the client.\n        \n    - `telefon`: (string) The updated phone number of the client.\n        \n\nExample:\n\n``` json\n{\n  \"nume\": \"Testulescu\",\n  \"prenume\": \"Test-Actualizat\",\n  \"email\": \"test.actualizat@example.com\",\n  \"telefon\": \"0711223344\"\n}\n\n ```\n\n### Response\n\nThe response for this request is not specified. However, you can use the following JSON schema as a reference for the response:\n\n``` json\n{\n{\n  \"id\": 3,\n  \"nume\": \"Testulescu\",\n  \"prenume\": \"Test-Updated\",\n  \"email\": \"test.updated@example.com\",\n  \"telefon\": \"0711223344\",\n  \"activ\": true,\n  \"createdAt\": \"2024-04-22T12:30:00.000Z\",\n  \"updatedAt\": \"2024-04-22T12:35:00.000Z\"\n}\n\n ```"
+					},
+					"response": []
+				},
+				{
+					"name": "Deactivate Client",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Verifică statusul răspunsului\r",
+									"pm.test(\"Status code is 200\", function() {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"// Verifică mesajul de confirmare\r",
+									"pm.test(\"Deactivation confirmation message\", function() {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData).to.have.property('message');\r",
+									"    pm.expect(jsonData.message).to.include('dezactivat');\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/clients/{{createdClientId}}/deactivate",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"clients",
+								"{{createdClientId}}",
+								"deactivate"
+							]
+						},
+						"description": "### Deactivate Client\n\nThis endpoint sends an HTTP PATCH request to deactivate a specific client.\n\n#### Request Body\n\n- `reason` (string, required): The reason for deactivating the client.\n    \n\n#### Response\n\nThe response schema for this request is as follows:\n\n``` json\n{\n  \"message\": \"Client with ID 3 has been successfully deactivated\"\n}\n\n ```"
+					},
+					"response": []
+				},
+				{
+					"name": "Reactivate Client",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Verifică statusul răspunsului\r",
+									"pm.test(\"Status code is 200\", function() {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"// Verifică mesajul de confirmare\r",
+									"pm.test(\"Reactivation confirmation message\", function() {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData).to.have.property('message');\r",
+									"    pm.expect(jsonData.message).to.include('reactivat');\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/clients/{{createdClientId}}/reactivate",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"clients",
+								"{{createdClientId}}",
+								"reactivate"
+							]
+						},
+						"description": "### Reactivate Client\n\nThis endpoint is used to reactivate a client by sending an HTTP PATCH request to `{{baseUrl}}/api/clients/{{createdClientId}}/reactivate`.\n\n#### Request Body\n\n- No request body is required for this endpoint.\n    \n\n#### Response\n\n- `status`: (number) The HTTP status code of the response.\n    \n- `message`: (string) A message indicating the result of the reactivation process."
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Cars",
+			"item": [
+				{
+					"name": "Get All Cars",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Verifică statusul răspunsului\r",
+									"pm.test(\"Status code is 200\", function() {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"// Verifică dacă răspunsul este un array\r",
+									"pm.test(\"Response is an array\", function() {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    pm.expect(Array.isArray(jsonData)).to.be.true;\r",
+									"});\r",
+									"\r",
+									"// Dacă există mașini, verifică structura primei mașini\r",
+									"if (pm.response.json().length > 0) {\r",
+									"    pm.test(\"Car object has required properties\", function() {\r",
+									"        var firstCar = pm.response.json()[0];\r",
+									"        pm.expect(firstCar).to.have.property('id');\r",
+									"        pm.expect(firstCar).to.have.property('clientId');\r",
+									"        pm.expect(firstCar).to.have.property('numarInmatriculare');\r",
+									"        pm.expect(firstCar).to.have.property('marca');\r",
+									"        pm.expect(firstCar).to.have.property('model');\r",
+									"    });\r",
+									"    \r",
+									"    // Salvează ID-ul primei mașini pentru teste ulterioare\r",
+									"    pm.environment.set(\"masinaId\", pm.response.json()[0].id);\r",
+									"}"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/masini",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"masini"
+							]
+						},
+						"description": "This endpoint makes an HTTP GET request to retrieve a list of \"masini\" from the server.\n\nThe response of this request can be documented as a JSON schema to describe the structure of the data returned by the API."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Car by Id",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Verifică statusul răspunsului\r",
+									"pm.test(\"Status code is 200\", function() {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"// Verifică structura mașinii\r",
+									"pm.test(\"Car object has required properties\", function() {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData).to.have.property('id');\r",
+									"    pm.expect(jsonData).to.have.property('clientId');\r",
+									"    pm.expect(jsonData).to.have.property('numarInmatriculare');\r",
+									"    pm.expect(jsonData).to.have.property('seriesSasiu');\r",
+									"    pm.expect(jsonData).to.have.property('marca');\r",
+									"    pm.expect(jsonData).to.have.property('model');\r",
+									"    pm.expect(jsonData).to.have.property('anFabricatie');\r",
+									"    pm.expect(jsonData).to.have.property('tipMotorizare');\r",
+									"    pm.expect(jsonData).to.have.property('capacitateMotor');\r",
+									"    pm.expect(jsonData).to.have.property('caiPutere');\r",
+									"    pm.expect(jsonData).to.have.property('kW');\r",
+									"});\r",
+									"\r",
+									"// Verifică dacă ID-ul mașinii este corect\r",
+									"pm.test(\"Car ID is correct\", function() {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData.id).to.eql(parseInt(pm.environment.get(\"masinaId\")));\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/masini/{{masinaId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"masini",
+								"{{masinaId}}"
+							]
+						},
+						"description": "# Get Masina by ID\n\nThis endpoint retrieves information about a specific masina identified by the masinaId.\n\n## Request\n\n### Request URL\n\n- `GET /api/masini/{{masinaId}}`\n    \n\n### Request Parameters\n\n- `masinaId` (path) : The ID of the masina to retrieve.\n    \n\n## Response\n\nThe response will be a JSON object with the following properties:\n\nExample:\n\n``` json\n{\n  \"id\": 1,\n  \"clientId\": 1,\n  \"numarInmatriculare\": \"B 01 ABC\",\n  \"seriesSasiu\": \"WVWZZZ1JZXW000001\",\n  \"marca\": \"Volkswagen\",\n  \"model\": \"Golf\",\n  \"anFabricatie\": 2018,\n  \"tipMotorizare\": \"diesel\",\n  \"capacitateMotor\": 1968,\n  \"caiPutere\": 150,\n  \"kW\": 110,\n  \"activ\": true,\n  \"createdAt\": \"2024-01-15T00:00:00.000Z\",\n  \"updatedAt\": \"2024-01-15T00:00:00.000Z\"\n}\n\n ```"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Cars by Client Id",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Verifică statusul răspunsului\r",
+									"pm.test(\"Status code is 200\", function() {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"// Verifică dacă răspunsul este un array\r",
+									"pm.test(\"Response is an array\", function() {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    pm.expect(Array.isArray(jsonData)).to.be.true;\r",
+									"});\r",
+									"\r",
+									"// Verifică dacă toate mașinile aparțin clientului specificat\r",
+									"if (pm.response.json().length > 0) {\r",
+									"    pm.test(\"All cars belong to the specified client\", function() {\r",
+									"        var cars = pm.response.json();\r",
+									"        var clientId = parseInt(pm.environment.get(\"clientId\"));\r",
+									"        \r",
+									"        var allBelongToClient = cars.every(function(car) {\r",
+									"            return car.clientId === clientId;\r",
+									"        });\r",
+									"        \r",
+									"        pm.expect(allBelongToClient).to.be.true;\r",
+									"    });\r",
+									"}"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/masini/client/{{masinaId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"masini",
+								"client",
+								"{{masinaId}}"
+							]
+						},
+						"description": "This endpoint makes an HTTP GET request to retrieve information about a specific client's car identified by the masinaId. The purpose of the request is to fetch details such as the car's make, model, year, and any other relevant information associated with the client's car.\n\n### Request Parameters\n\n- `masinaId`: The unique identifier of the client's car.\n    \n\n### Response\n\nThe response will include the details of the client's car."
+					},
+					"response": []
+				},
+				{
+					"name": "Create Car",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Verifică statusul răspunsului\r",
+									"pm.test(\"Status code is 201\", function() {\r",
+									"    pm.response.to.have.status(201);\r",
+									"});\r",
+									"\r",
+									"// Verifică structura mașinii create\r",
+									"pm.test(\"Created car has required properties\", function() {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData).to.have.property('id');\r",
+									"    pm.expect(jsonData).to.have.property('clientId');\r",
+									"    pm.expect(jsonData).to.have.property('numarInmatriculare');\r",
+									"    pm.expect(jsonData).to.have.property('seriesSasiu');\r",
+									"    pm.expect(jsonData).to.have.property('marca');\r",
+									"    pm.expect(jsonData).to.have.property('model');\r",
+									"});\r",
+									"\r",
+									"// Verifică dacă datele mașinii sunt corecte\r",
+									"pm.test(\"Car data is correct\", function() {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData.clientId).to.eql(parseInt(pm.environment.get(\"clientId\")));\r",
+									"    pm.expect(jsonData.numarInmatriculare).to.eql(\"B99TEST\");\r",
+									"    pm.expect(jsonData.marca).to.eql(\"TestMarca\");\r",
+									"    pm.expect(jsonData.model).to.eql(\"TestModel\");\r",
+									"});\r",
+									"\r",
+									"// Salvează ID-ul mașinii create pentru teste ulterioare\r",
+									"pm.environment.set(\"createdMasinaId\", pm.response.json().id);"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"clientId\": {{clientId}},\r\n  \"numarInmatriculare\": \"B99TEST\",\r\n  \"seriesSasiu\": \"TEST123456789012345\",\r\n  \"marca\": \"TestMarca\",\r\n  \"model\": \"TestModel\",\r\n  \"anFabricatie\": 2022,\r\n  \"tipMotorizare\": \"benzina\",\r\n  \"capacitateMotor\": 1600,\r\n  \"caiPutere\": 120\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/masini",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"masini"
+							]
+						},
+						"description": "### API POST /api/masini\n\nThis endpoint is used to create a new entry for a car in the system.\n\n#### Request Body\n\n- `clientId` (object, required): The ID of the client associated with the car.\n    \n\n#### Response\n\nThe response of this request is a JSON schema describing the structure of the response object."
+					},
+					"response": []
+				},
+				{
+					"name": "Update Car",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Verifică statusul răspunsului\r",
+									"pm.test(\"Status code is 200\", function() {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"// Verifică dacă datele mașinii sunt actualizate corect\r",
+									"pm.test(\"Car data is updated correctly\", function() {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData.id).to.eql(parseInt(pm.environment.get(\"createdMasinaId\")));\r",
+									"    pm.expect(jsonData.numarInmatriculare).to.eql(\"B99MOD\");\r",
+									"    pm.expect(jsonData.model).to.eql(\"TestModelUpdated\");\r",
+									"    pm.expect(jsonData.anFabricatie).to.eql(2023);\r",
+									"    pm.expect(jsonData.caiPutere).to.eql(140);\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"numarInmatriculare\": \"B99MOD\",\r\n  \"model\": \"TestModelUpdated\",\r\n  \"anFabricatie\": 2023,\r\n  \"caiPutere\": 140\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/masini/{{createdMasinaId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"masini",
+								"{{createdMasinaId}}"
+							]
+						},
+						"description": "### Update Car Details\n\nThis endpoint is used to update the details of a specific car.\n\n#### Request Body\n\n- `numarInmatriculare` (string) - The updated license plate number of the car.\n    \n- `model` (string) - The updated model of the car.\n    \n- `anFabricatie` (number) - The updated manufacturing year of the car.\n    \n- `caiPutere` (number) - The updated horsepower of the car.\n    \n\n#### Response\n\nThe response for this request follows the JSON schema below:\n\n``` json\n{\n  \"id\": 4,\n  \"clientId\": 1,\n  \"numarInmatriculare\": \"B99MOD\",\n  \"seriesSasiu\": \"TEST123456789012345\",\n  \"marca\": \"TestMarca\",\n  \"model\": \"TestModelUpdated\",\n  \"anFabricatie\": 2023,\n  \"tipMotorizare\": \"petrol\",\n  \"capacitateMotor\": 1600,\n  \"caiPutere\": 140,\n  \"kW\": 102.97,\n  \"activ\": true,\n  \"createdAt\": \"2024-04-22T12:45:00.000Z\",\n  \"updatedAt\": \"2024-04-22T12:50:00.000Z\"\n}\n\n ```"
+					},
+					"response": []
+				},
+				{
+					"name": "Deactivate Car",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Verifică statusul răspunsului\r",
+									"pm.test(\"Status code is 200\", function() {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"// Verifică mesajul de confirmare\r",
+									"pm.test(\"Deactivation confirmation message\", function() {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData).to.have.property('message');\r",
+									"    pm.expect(jsonData.message).to.include('dezactivată');\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/masini/{{createdMasinaId}}/deactivate",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"masini",
+								"{{createdMasinaId}}",
+								"deactivate"
+							]
+						},
+						"description": "### Deactivate Masina\n\nThis endpoint is used to deactivate a specific \"masina\" by sending an HTTP PATCH request to the specified URL.\n\n#### Request\n\n- Method: `PATCH`\n    \n- URL: `{{baseUrl}}/api/masini/{{createdMasinaId}}/deactivate`\n    \n- Body:\n    \n    - No request body parameters required.\n        \n\n#### Response\n\nThe response for this request will be a JSON object following the schema below:\n\n``` json\n{\n  \"message\": \"Car with ID 4 has been successfully deactivated\"\n}\n\n ```"
+					},
+					"response": []
+				},
+				{
+					"name": "Reactivate Car",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Verifică statusul răspunsului\r",
+									"pm.test(\"Status code is 200\", function() {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"// Verifică mesajul de confirmare\r",
+									"pm.test(\"Reactivation confirmation message\", function() {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData).to.have.property('message');\r",
+									"    pm.expect(jsonData.message).to.include('reactivată');\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/masini/{{createdMasinaId}}/reactivate",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"masini",
+								"{{createdMasinaId}}",
+								"reactivate"
+							]
+						},
+						"description": "The HTTP PATCH request is used to reactivate a specific \"masina\" (car) identified by the \"createdMasinaId\" in the API. The request updates the status of the car to reactivate it.\n\n### Response\n\nThe response of this request is a JSON schema representing the properties and structure of the response data. The schema will define the expected keys and their data types for the response."
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Car Parts",
+			"item": [
+				{
+					"name": "Get All Parts",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Verifică statusul răspunsului\r",
+									"pm.test(\"Status code is 200\", function() {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"// Verifică dacă răspunsul este un array\r",
+									"pm.test(\"Response is an array\", function() {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    pm.expect(Array.isArray(jsonData)).to.be.true;\r",
+									"});\r",
+									"\r",
+									"// Dacă există piese, verifică structura primei piese\r",
+									"if (pm.response.json().length > 0) {\r",
+									"    pm.test(\"Part object has required properties\", function() {\r",
+									"        var firstPart = pm.response.json()[0];\r",
+									"        pm.expect(firstPart).to.have.property('id');\r",
+									"        pm.expect(firstPart).to.have.property('denumire');\r",
+									"        pm.expect(firstPart).to.have.property('cod');\r",
+									"        pm.expect(firstPart).to.have.property('pret');\r",
+									"        pm.expect(firstPart).to.have.property('stoc');\r",
+									"    });\r",
+									"    \r",
+									"    // Salvează ID-ul primei piese pentru teste ulterioare\r",
+									"    pm.environment.set(\"piesaId\", pm.response.json()[0].id);\r",
+									"}"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/piese",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"piese"
+							]
+						},
+						"description": "### Retrieve Piese\n\nThis endpoint makes an HTTP GET request to retrieve a list of piese.\n\n#### Request\n\nNo request body is required for this endpoint.\n\n#### Response\n\nThe response will be a JSON object with the following schema:\n\n``` json\n[\n  {\n    \"id\": 1,\n    \"denumire\": \"Oil Filter\",\n    \"cod\": \"FU-001\",\n    \"pret\": 45.99,\n    \"stoc\": 50,\n    \"activa\": true\n  },\n  ...\n]\n\n ```"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Part by Id",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Verifică statusul răspunsului\r",
+									"pm.test(\"Status code is 200\", function() {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"// Verifică structura piesei\r",
+									"pm.test(\"Part object has required properties\", function() {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData).to.have.property('id');\r",
+									"    pm.expect(jsonData).to.have.property('denumire');\r",
+									"    pm.expect(jsonData).to.have.property('cod');\r",
+									"    pm.expect(jsonData).to.have.property('descriere');\r",
+									"    pm.expect(jsonData).to.have.property('pret');\r",
+									"    pm.expect(jsonData).to.have.property('stoc');\r",
+									"    pm.expect(jsonData).to.have.property('activa');\r",
+									"});\r",
+									"\r",
+									"// Verifică dacă ID-ul piesei este corect\r",
+									"pm.test(\"Part ID is correct\", function() {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData.id).to.eql(parseInt(pm.environment.get(\"piesaId\")));\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/piese/{{piesaId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"piese",
+								"{{piesaId}}"
+							]
+						},
+						"description": "This endpoint retrieves information about a specific item by its ID. The request should include the `piesaId` as a path parameter to identify the item.\n\n### Request Parameters\n\n- `piesaId`: The ID of the item to retrieve.\n    \n\n### Response\n\nThe response will include the details of the item identified by the `piesaId`, such as its name, category, and other relevant information."
+					},
+					"response": []
+				},
+				{
+					"name": "Create Part",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Verifică statusul răspunsului\r",
+									"pm.test(\"Status code is 201\", function() {\r",
+									"    pm.response.to.have.status(201);\r",
+									"});\r",
+									"\r",
+									"// Verifică structura piesei create\r",
+									"pm.test(\"Created part has required properties\", function() {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData).to.have.property('id');\r",
+									"    pm.expect(jsonData).to.have.property('denumire');\r",
+									"    pm.expect(jsonData).to.have.property('cod');\r",
+									"    pm.expect(jsonData).to.have.property('descriere');\r",
+									"    pm.expect(jsonData).to.have.property('pret');\r",
+									"    pm.expect(jsonData).to.have.property('stoc');\r",
+									"});\r",
+									"\r",
+									"// Verifică dacă datele piesei sunt corecte\r",
+									"pm.test(\"Part data is correct\", function() {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    var requestData = JSON.parse(pm.request.body.raw);\r",
+									"    \r",
+									"    pm.expect(jsonData.denumire).to.eql(\"Piesă de test\");\r",
+									"    pm.expect(jsonData.cod).to.eql(requestData.cod); // Verifică codul folosit în request\r",
+									"    pm.expect(Number(jsonData.pret)).to.be.approximately(99.99, 0.01);\r",
+									"    pm.expect(jsonData.stoc).to.eql(10);\r",
+									"});\r",
+									"\r",
+									"// Salvează ID-ul piesei create pentru teste ulterioare\r",
+									"pm.environment.set(\"createdPiesaId\", pm.response.json().id);"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"denumire\": \"Piesă de test\",\r\n  \"cod\": \"TEST-{{$timestamp}}\", // Va genera un cod unic bazat pe timestamp\r\n  \"descriere\": \"O piesă pentru testare\",\r\n  \"pret\": 99.99,\r\n  \"stoc\": 10\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/piese",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"piese"
+							]
+						},
+						"description": "This endpoint allows you to create a new \"piesă\" by sending an HTTP POST request to {{baseUrl}}/api/piese. The request should include a JSON payload in the raw request body with the following parameters:\n\n- \"denumire\" (string): The name of the \"piesă\".\n    \n- \"cod\" (string): The unique code for the \"piesă\", which can include a timestamp for uniqueness.\n    \n- \"descriere\" (string): A description of the \"piesă\".\n    \n- \"pret\" (number): The price of the \"piesă\".\n    \n- \"stoc\" (number): The available stock of the \"piesă\".\n    \n\nUpon successful creation, the response will include the details of the newly created \"piesă\"."
+					},
+					"response": []
+				},
+				{
+					"name": "Update Part",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Verifică statusul răspunsului\r",
+									"pm.test(\"Status code is 200\", function() {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"// Verifică dacă datele piesei sunt actualizate corect\r",
+									"pm.test(\"Part data is updated correctly\", function() {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData.id).to.eql(parseInt(pm.environment.get(\"createdPiesaId\")));\r",
+									"    pm.expect(jsonData.denumire).to.eql(\"Piesă de test actualizată\");\r",
+									"    pm.expect(jsonData.descriere).to.eql(\"O piesă pentru testare - actualizată\");\r",
+									"    pm.expect(jsonData.pret).to.eql(109.99);\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"denumire\": \"Piesă de test actualizată\",\r\n  \"descriere\": \"O piesă pentru testare - actualizată\",\r\n  \"pret\": 109.99\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/piese/{{createdPiesaId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"piese",
+								"{{createdPiesaId}}"
+							]
+						},
+						"description": "### Update Piesa\n\nThis endpoint is used to update a specific \"piesa\" by its ID.\n\n#### Request\n\n- Method: PUT\n    \n- URL: `{{baseUrl}}/api/piese/{{createdPiesaId}}`\n    \n- Body:\n    \n    - denumire (string, required): The updated name of the \"piesa\".\n        \n    - descriere (string, required): The updated description of the \"piesa\".\n        \n    - pret (number, required): The updated price of the \"piesa\".\n        \n\n#### Response\n\nThe response for this request is a JSON object conforming to the following schema:\n\n``` json\n{\n  \"id\": 10,\n  \"denumire\": \"Updated Test Part\",\n  \"cod\": \"TEST-20240422\",\n  \"descriere\": \"A part for testing - updated\",\n  \"pret\": 109.99,\n  \"stoc\": 10,\n  \"activa\": true,\n  \"createdAt\": \"2024-04-22T13:00:00.000Z\",\n  \"updatedAt\": \"2024-04-22T13:05:00.000Z\"\n}\n\n ```"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Stock",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Verifică statusul răspunsului\r",
+									"pm.test(\"Status code is 200\", function() {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"// Verifică mesajul de confirmare și stocul actualizat\r",
+									"pm.test(\"Stock update confirmation\", function() {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData).to.have.property('message');\r",
+									"    pm.expect(jsonData).to.have.property('stoc');\r",
+									"    pm.expect(jsonData.message).to.include('actualizat');\r",
+									"    \r",
+									"    // Stocul inițial era 10, am adăugat 5, deci ar trebui să fie 15\r",
+									"    pm.expect(jsonData.stoc).to.eql(15);\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"quantity\": 5\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/piese/{{createdPiesaId}}/updateStock",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"piese",
+								"{{createdPiesaId}}",
+								"updateStock"
+							]
+						},
+						"description": "This endpoint makes an HTTP PATCH request to update the stock quantity of a specific item identified by the createdPiesaId in the URL.\n\n### Request Body\n\n- `quantity` (number) - The updated stock quantity of the item.\n    \n\n### Response\n\nThe response of this request is documented as a JSON schema:\n\n``` json\n{\n  \"message\": \"Part stock has been successfully updated\",\n  \"stoc\": 15\n}\n\n ```"
+					},
+					"response": []
+				},
+				{
+					"name": "Deactivate Part",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Verifică statusul răspunsului\r",
+									"pm.test(\"Status code is 200\", function() {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"// Verifică mesajul de confirmare\r",
+									"pm.test(\"Deactivation confirmation message\", function() {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData).to.have.property('message');\r",
+									"    pm.expect(jsonData.message).to.include('dezactivată');\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/piese/{{createdPiesaId}}/deactivate",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"piese",
+								"{{createdPiesaId}}",
+								"deactivate"
+							]
+						},
+						"description": "### Deactivate Piesa\n\nThis endpoint is used to deactivate a specific piesa by sending an HTTP PATCH request to the specified URL.\n\n#### Request\n\n- Method: `PATCH`\n    \n- URL: `{{baseUrl}}/api/piese/{{createdPiesaId}}/deactivate`\n    \n\n#### Request Body\n\n- There is no request body for this endpoint.\n    \n\n#### Response\n\nThe response for this request is a JSON object with the following schema:\n\n``` json\n{\n  \"message\": \"Part with ID 10 has been successfully deactivated\"\n}\n\n ```\n\n- `status` (string): Indicates the status of the deactivation process.\n    \n- `message` (string): Provides a message related to the deactivation status."
+					},
+					"response": []
+				},
+				{
+					"name": "Reactivate Part",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Verifică statusul răspunsului\r",
+									"pm.test(\"Status code is 200\", function() {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"// Verifică mesajul de confirmare\r",
+									"pm.test(\"Reactivation confirmation message\", function() {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData).to.have.property('message');\r",
+									"    pm.expect(jsonData.message).to.include('reactivată');\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/piese/{{createdPiesaId}}/reactivate",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"piese",
+								"{{createdPiesaId}}",
+								"reactivate"
+							]
+						},
+						"description": "### Reactivate Piesa\n\nThis endpoint is used to reactivate a specific \"piesa\" by sending an HTTP PATCH request to the specified URL.\n\n#### Request Body\n\n- `reason` (text, required): A brief explanation for reactivating the \"piesa\".\n    \n\n#### Response\n\nThe response will contain the updated details of the reactivated \"piesa\"."
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Appointments",
+			"item": [
+				{
+					"name": "Get All Appointments",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Verifică statusul răspunsului\r",
+									"pm.test(\"Status code is 200\", function() {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"// Verifică dacă răspunsul este un array\r",
+									"pm.test(\"Response is an array\", function() {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    pm.expect(Array.isArray(jsonData)).to.be.true;\r",
+									"});\r",
+									"\r",
+									"// Dacă există programări, salvează ID-ul pentru teste ulterioare\r",
+									"if (pm.response.json().length > 0) {\r",
+									"    pm.environment.set(\"programareId\", pm.response.json()[0].id);\r",
+									"}"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/programari",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"programari"
+							]
+						},
+						"description": "This endpoint sends an HTTP GET request to retrieve a list of appointments. The response of this request is documented below as a JSON schema.\n\n``` json\n[\n  {\n    \"id\": 1,\n    \"clientId\": 1,\n    \"masinaId\": 1,\n    \"dataOra\": \"2024-04-25T10:00:00.000Z\",\n    \"durata\": 90,\n    \"descriereProblema\": \"Annual service\",\n    \"metodaContact\": \"phone\",\n    \"status\": \"scheduled\",\n    \"createdAt\": \"2024-04-15T00:00:00.000Z\",\n    \"updatedAt\": \"2024-04-15T00:00:00.000Z\"\n  },\n  ...\n]\n\n ```"
+					},
+					"response": []
+				},
+				{
+					"name": "Create Appointment",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Verifică statusul răspunsului\r",
+									"pm.test(\"Status code is 201\", function() {\r",
+									"    pm.response.to.have.status(201);\r",
+									"});\r",
+									"\r",
+									"// Verifică structura programării create\r",
+									"pm.test(\"Created appointment has required properties\", function() {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData).to.have.property('id');\r",
+									"    pm.expect(jsonData).to.have.property('clientId');\r",
+									"    pm.expect(jsonData).to.have.property('masinaId');\r",
+									"    pm.expect(jsonData).to.have.property('dataOra');\r",
+									"    pm.expect(jsonData).to.have.property('durata');\r",
+									"    pm.expect(jsonData).to.have.property('descriereProblema');\r",
+									"    pm.expect(jsonData).to.have.property('metodaContact');\r",
+									"    pm.expect(jsonData).to.have.property('status');\r",
+									"});\r",
+									"\r",
+									"// Verifică dacă datele programării sunt corecte\r",
+									"pm.test(\"Appointment data is correct\", function() {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData.clientId).to.eql(parseInt(pm.environment.get(\"clientId\")));\r",
+									"    pm.expect(jsonData.masinaId).to.eql(parseInt(pm.environment.get(\"masinaId\")));\r",
+									"    pm.expect(jsonData.durata).to.eql(60);\r",
+									"    pm.expect(jsonData.descriereProblema).to.eql(\"Revizie periodică\");\r",
+									"    pm.expect(jsonData.metodaContact).to.eql(\"telefon\");\r",
+									"    pm.expect(jsonData.status).to.eql(\"programat\");\r",
+									"});\r",
+									"\r",
+									"// Salvează ID-ul programării create pentru teste ulterioare\r",
+									"pm.environment.set(\"createdProgramareId\", pm.response.json().id);"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"// Adaugă acest script în tab-ul Pre-request Script\r",
+									"const futureDate = new Date();\r",
+									"futureDate.setDate(futureDate.getDate() + Math.floor(Math.random() * 30) + 1); // între 1 și 30 zile în viitor\r",
+									"futureDate.setHours(8 + Math.floor(Math.random() * 8)); // oră între 8:00 și 15:00\r",
+									"futureDate.setMinutes(Math.floor(Math.random() * 2) * 30); // minute: 0 sau 30 (multiplu de 30 minute)\r",
+									"futureDate.setSeconds(0);\r",
+									"futureDate.setMilliseconds(0);\r",
+									"\r",
+									"// Asigură-te că nu este weekend\r",
+									"const day = futureDate.getDay();\r",
+									"if (day === 0) futureDate.setDate(futureDate.getDate() + 1); // dacă e duminică, treci la luni\r",
+									"if (day === 6) futureDate.setDate(futureDate.getDate() + 2); // dacă e sâmbătă, treci la luni\r",
+									"\r",
+									"// Formatează data pentru ISO string\r",
+									"const futureDateISO = futureDate.toISOString();\r",
+									"\r",
+									"// Setează ca variabilă de mediu\r",
+									"pm.environment.set(\"futureAppointmentDate\", futureDateISO);\r",
+									"console.log(\"Data programării setată la:\", futureDateISO);"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"clientId\": {{clientId}},\r\n  \"masinaId\": {{masinaId}},\r\n  \"dataOra\": \"{{futureAppointmentDate}}\",\r\n  \"durata\": 60,\r\n  \"descriereProblema\": \"Revizie periodică\",\r\n  \"metodaContact\": \"telefon\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/programari",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"programari"
+							]
+						},
+						"description": "# Create a New Appointment\n\nThis endpoint is used to create a new appointment for a client.\n\n## Request Body\n\n- `clientId` (object, required): The ID of the client for whom the appointment is being created.\n    \n\n## Response\n\nThe response will contain the details of the newly created appointment."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Appointment by ID",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Verifică statusul răspunsului\r",
+									"pm.test(\"Status code is 200\", function() {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"// Verifică structura programării\r",
+									"pm.test(\"Appointment has required properties\", function() {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData).to.have.property('id');\r",
+									"    pm.expect(jsonData).to.have.property('clientId');\r",
+									"    pm.expect(jsonData).to.have.property('masinaId');\r",
+									"    pm.expect(jsonData).to.have.property('dataOra');\r",
+									"    pm.expect(jsonData).to.have.property('durata');\r",
+									"    pm.expect(jsonData).to.have.property('descriereProblema');\r",
+									"    pm.expect(jsonData).to.have.property('metodaContact');\r",
+									"    pm.expect(jsonData).to.have.property('status');\r",
+									"});\r",
+									"\r",
+									"// Verifică dacă ID-ul programării este corect\r",
+									"pm.test(\"Appointment ID is correct\", function() {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData.id).to.eql(parseInt(pm.environment.get(\"createdProgramareId\")));\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/programari/{{createdProgramareId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"programari",
+								"{{createdProgramareId}}"
+							]
+						},
+						"description": "This endpoint makes an HTTP GET request to retrieve information about a specific appointment by providing the appointment ID in the URL path. The request does not include a request body.\n\nThe response will include details about the appointment, such as the appointment ID, date and time, patient information, and any additional notes or descriptions associated with the appointment."
+					},
+					"response": []
+				},
+				{
+					"name": "Update Appointment Status",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Verifică statusul răspunsului\r",
+									"pm.test(\"Status code is 200\", function() {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"// Verifică mesajul de confirmare și statusul actualizat\r",
+									"pm.test(\"Status update confirmation\", function() {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData).to.have.property('message');\r",
+									"    pm.expect(jsonData).to.have.property('programare');\r",
+									"    pm.expect(jsonData.message).to.include('actualizat');\r",
+									"    pm.expect(jsonData.programare.status).to.eql(\"in lucru\");\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"status\": \"in lucru\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/programari/{{createdProgramareId}}/status",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"programari",
+								"{{createdProgramareId}}",
+								"status"
+							]
+						},
+						"description": "### Update Programare Status\n\nThis endpoint is used to update the status of a specific programare.\n\n#### Request\n\n- Method: `PATCH`\n    \n- URL: `{{baseUrl}}/api/programari/{{createdProgramareId}}/status`\n    \n- { \"status\": \"in lucru\"}\n    \n\n#### Response\n\nThe response for this request is a JSON object conforming to the following schema:\n\n``` json\n{\n  \"id\": 5,\n  \"clientId\": 1,\n  \"masinaId\": 1,\n  \"dataOra\": \"2024-05-01T15:00:00.000Z\",\n  \"durata\": 90,\n  \"descriereProblema\": \"Updated regular maintenance\",\n  \"metodaContact\": \"phone\",\n  \"status\": \"scheduled\",\n  \"createdAt\": \"2024-04-22T13:15:00.000Z\",\n  \"updatedAt\": \"2024-04-22T13:20:00.000Z\"\n}\n\n ```"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Appointments by Client ID",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Verifică statusul răspunsului\r",
+									"pm.test(\"Status code is 200\", function() {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"// Verifică dacă răspunsul este un array\r",
+									"pm.test(\"Response is an array\", function() {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    pm.expect(Array.isArray(jsonData)).to.be.true;\r",
+									"});\r",
+									"\r",
+									"// Verifică dacă toate programările aparțin clientului specificat\r",
+									"if (pm.response.json().length > 0) {\r",
+									"    pm.test(\"All appointments belong to the specified client\", function() {\r",
+									"        var appointments = pm.response.json();\r",
+									"        var clientId = parseInt(pm.environment.get(\"clientId\"));\r",
+									"        \r",
+									"        var allBelongToClient = appointments.every(function(appointment) {\r",
+									"            return appointment.clientId === clientId;\r",
+									"        });\r",
+									"        \r",
+									"        pm.expect(allBelongToClient).to.be.true;\r",
+									"    });\r",
+									"}"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/programari/client/{{clientId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"programari",
+								"client",
+								"{{clientId}}"
+							]
+						},
+						"description": "### Get Client Appointments\n\nThis endpoint retrieves the appointments for a specific client.\n\n#### Request\n\n- Method: GET\n    \n- URL: `{{baseUrl}}/api/programari/client/{{clientId}}`\n    \n\n#### Response\n\nThe response for this request is a JSON object conforming to the following schema:\n\n``` json\n[\n  {\n    \"id\": 1,\n    \"clientId\": 1,\n    \"masinaId\": 1,\n    \"dataOra\": \"2024-04-25T10:00:00.000Z\",\n    \"durata\": 90,\n    \"descriereProblema\": \"Annual service\",\n    \"metodaContact\": \"phone\",\n    \"status\": \"scheduled\"\n  },\n  {\n    \"id\": 5,\n    \"clientId\": 1,\n    \"masinaId\": 1,\n    \"dataOra\": \"2024-05-01T15:00:00.000Z\",\n    \"durata\": 90,\n    \"descriereProblema\": \"Updated regular maintenance\",\n    \"metodaContact\": \"phone\",\n    \"status\": \"in progress\"\n  }\n]\n\n ```"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Appointments by Car ID",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Verifică statusul răspunsului\r",
+									"pm.test(\"Status code is 200\", function() {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"// Verifică dacă răspunsul este un array\r",
+									"pm.test(\"Response is an array\", function() {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    pm.expect(Array.isArray(jsonData)).to.be.true;\r",
+									"});\r",
+									"\r",
+									"// Verifică dacă toate programările aparțin mașinii specificate\r",
+									"if (pm.response.json().length > 0) {\r",
+									"    pm.test(\"All appointments belong to the specified car\", function() {\r",
+									"        var appointments = pm.response.json();\r",
+									"        var masinaId = parseInt(pm.environment.get(\"masinaId\"));\r",
+									"        \r",
+									"        var allBelongToCar = appointments.every(function(appointment) {\r",
+									"            return appointment.masinaId === masinaId;\r",
+									"        });\r",
+									"        \r",
+									"        pm.expect(allBelongToCar).to.be.true;\r",
+									"    });\r",
+									"}"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/programari/masina/{{masinaId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"programari",
+								"masina",
+								"{{masinaId}}"
+							]
+						},
+						"description": "### Get Car Appointment Details\n\nThis endpoint retrieves the appointment details for a specific car based on the provided `masinaId`.\n\n#### Request Parameters\n\n- `masinaId` (path parameter) - The ID of the car for which the appointment details are to be retrieved.\n    \n\n#### Response\n\nThe response will include the appointment details for the specified car, including the appointment date, time, and any additional information related to the appointment."
+					},
+					"response": []
+				},
+				{
+					"name": "Update Appointment",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Verifică statusul răspunsului\r",
+									"pm.test(\"Status code is 200\", function() {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"// Verifică dacă datele programării sunt actualizate corect\r",
+									"pm.test(\"Appointment data is updated correctly\", function() {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    var requestData = JSON.parse(pm.request.body.raw);\r",
+									"    \r",
+									"    pm.expect(jsonData.id).to.eql(parseInt(pm.environment.get(\"createdProgramareId\")));\r",
+									"    \r",
+									"    // Verifică doar că dataOra este un string valid care conține formatul de dată\r",
+									"    pm.expect(jsonData.dataOra).to.be.a('string');\r",
+									"    pm.expect(jsonData.dataOra).to.match(/^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:00\\.\\d{3}Z$/);\r",
+									"    \r",
+									"    pm.expect(jsonData.durata).to.eql(requestData.durata || 90);\r",
+									"    pm.expect(jsonData.descriereProblema).to.eql(requestData.descriereProblema || \"Revizie periodică și verificare frâne\");\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"dataOra\": \"{{futureAppointmentDate}}\",\r\n  \"durata\": 60,\r\n  \"descriereProblema\": \"Revizie periodică actualizată\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/programari/{{createdProgramareId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"programari",
+								"{{createdProgramareId}}"
+							]
+						},
+						"description": "### Update Appointment\n\nThis endpoint is used to update an existing appointment by making an HTTP PUT request to the specified URL.\n\n#### Request\n\nThe request should include a JSON payload in the raw request body with the following parameters:\n\n- `dataOra` (string): The updated appointment date and time.\n    \n- `durata` (number): The updated duration of the appointment in minutes.\n    \n- `descriereProblema` (string): The updated description of the appointment issue.\n    \n\nExample:\n\n``` json\n{\n  \"id\": 5,\n  \"clientId\": 1,\n  \"masinaId\": 1,\n  \"dataOra\": \"2024-05-01T15:00:00.000Z\",\n  \"durata\": 90,\n  \"descriereProblema\": \"Updated regular maintenance\",\n  \"metodaContact\": \"phone\",\n  \"status\": \"scheduled\",\n  \"createdAt\": \"2024-04-22T13:15:00.000Z\",\n  \"updatedAt\": \"2024-04-22T13:20:00.000Z\"\n}\n\n ```"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Service History",
+			"item": [
+				{
+					"name": "Create Car Reception",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Verifică statusul răspunsului\r",
+									"pm.test(\"Status code is 201\", function() {\r",
+									"    pm.response.to.have.status(201);\r",
+									"});\r",
+									"\r",
+									"// Verifică structura primirii create\r",
+									"pm.test(\"Created reception has required properties\", function() {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData).to.have.property('id');\r",
+									"    pm.expect(jsonData).to.have.property('programareId');\r",
+									"    pm.expect(jsonData).to.have.property('problemeVizuale');\r",
+									"    pm.expect(jsonData).to.have.property('problemeRaportateClient');\r",
+									"    pm.expect(jsonData).to.have.property('scopVizita');\r",
+									"});\r",
+									"\r",
+									"// Verifică dacă datele primirii sunt corecte\r",
+									"pm.test(\"Reception data is correct\", function() {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData.programareId).to.eql(parseInt(pm.environment.get(\"createdProgramareId\")));\r",
+									"    pm.expect(jsonData.problemeVizuale).to.eql(\"Zgârieturi ușoare pe aripa stângă\");\r",
+									"    pm.expect(jsonData.problemeRaportateClient).to.eql(\"Zgomot la frânare\");\r",
+									"    pm.expect(jsonData.scopVizita).to.eql(\"revizie\");\r",
+									"});\r",
+									"\r",
+									"// Salvează ID-ul primirii create pentru teste ulterioare\r",
+									"pm.environment.set(\"primireId\", pm.response.json().id);"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"programareId\": {{createdProgramareId}},\r\n  \"problemeVizuale\": \"Zgârieturi ușoare pe aripa stângă\",\r\n  \"problemeRaportateClient\": \"Zgomot la frânare\",\r\n  \"scopVizita\": \"revizie\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/istoric-service/primiri",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"istoric-service",
+								"primiri"
+							]
+						},
+						"description": "### POST /api/istoric-service/primiri\n\nThis endpoint is used to perform a POST request to create a new entry in the historical service for printing.\n\n#### Request Body\n\n- `programareId` (required, object): The ID of the appointment for which the printing entry is being created.\n    \n\n#### Response\n\nThe response for this request is a JSON object conforming to the following schema:\n\n``` json\n{\n  \"id\": 3,\n  \"programareId\": 5,\n  \"problemeVizuale\": \"Light scratches on the left wing\",\n  \"problemeRaportateClient\": \"Noise when braking\",\n  \"scopVizita\": \"maintenance\",\n  \"createdAt\": \"2024-04-22T13:30:00.000Z\",\n  \"updatedAt\": \"2024-04-22T13:30:00.000Z\"\n}\n\n ```"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Reception by Id",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Verifică statusul răspunsului\r",
+									"pm.test(\"Status code is 200\", function() {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"// Verifică structura primirii\r",
+									"pm.test(\"Reception has required properties\", function() {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData).to.have.property('id');\r",
+									"    pm.expect(jsonData).to.have.property('programareId');\r",
+									"    pm.expect(jsonData).to.have.property('problemeVizuale');\r",
+									"    pm.expect(jsonData).to.have.property('problemeRaportateClient');\r",
+									"    pm.expect(jsonData).to.have.property('scopVizita');\r",
+									"});\r",
+									"\r",
+									"// Verifică dacă ID-ul primirii este corect\r",
+									"pm.test(\"Reception ID is correct\", function() {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData.id).to.eql(parseInt(pm.environment.get(\"primireId\")));\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/istoric-service/primiri/{{primireId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"istoric-service",
+								"primiri",
+								"{{primireId}}"
+							]
+						},
+						"description": "### Get Istoric Service Primiri by ID\n\nThis endpoint retrieves the historical service records for a specific primire (reception) identified by the `primireId`.\n\n#### Request\n\n- Method: GET\n    \n- URL: `{{baseUrl}}/api/istoric-service/primiri/{{primireId}}`\n    \n\n#### Response\n\nThe response for this request is a JSON object conforming to the following schema:\n\n``` json\n{\n  \"id\": 3,\n  \"programareId\": 5,\n  \"problemeVizuale\": \"Light scratches on the left wing\",\n  \"problemeRaportateClient\": \"Noise when braking\",\n  \"scopVizita\": \"maintenance\",\n  \"createdAt\": \"2024-04-22T13:30:00.000Z\",\n  \"updatedAt\": \"2024-04-22T13:30:00.000Z\",\n  \"programare\": {\n    \"clientId\": 1,\n    \"masinaId\": 1,\n    \"dataOra\": \"2024-05-01T15:00:00.000Z\"\n  }\n}\n\n ```"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Reception by Appointment Id",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Verifică statusul răspunsului\r",
+									"pm.test(\"Status code is 200\", function() {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"// Verifică structura primirii\r",
+									"pm.test(\"Reception has required properties\", function() {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData).to.have.property('id');\r",
+									"    pm.expect(jsonData).to.have.property('programareId');\r",
+									"    pm.expect(jsonData).to.have.property('problemeVizuale');\r",
+									"    pm.expect(jsonData).to.have.property('problemeRaportateClient');\r",
+									"    pm.expect(jsonData).to.have.property('scopVizita');\r",
+									"});\r",
+									"\r",
+									"// Verifică dacă programarea ID este corectă\r",
+									"pm.test(\"Appointment ID is correct\", function() {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData.programareId).to.eql(parseInt(pm.environment.get(\"createdProgramareId\")));\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/istoric-service/primiri/programare/{{createdProgramareId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"istoric-service",
+								"primiri",
+								"programare",
+								"{{createdProgramareId}}"
+							]
+						},
+						"description": "### Get Programare Istoric\n\nThis endpoint retrieves the historical details of a specific programare by its ID.\n\n#### Request\n\n- Method: GET\n    \n- URL: `{{baseUrl}}/api/istoric-service/primiri/programare/{{createdProgramareId}}`\n    \n\n#### Response\n\nThe response will be a JSON object conforming to the following schema:\n\n``` json\n{\n  \"id\": 3,\n  \"programareId\": 5,\n  \"problemeVizuale\": \"Light scratches on the left wing\",\n  \"problemeRaportateClient\": \"Noise when braking\",\n  \"scopVizita\": \"maintenance\",\n  \"createdAt\": \"2024-04-22T13:30:00.000Z\",\n  \"updatedAt\": \"2024-04-22T13:30:00.000Z\"\n}\n\n ```"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Reception",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Verifică statusul răspunsului\r",
+									"pm.test(\"Status code is 200\", function() {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"// Verifică dacă datele primirii sunt actualizate corect\r",
+									"pm.test(\"Reception data is updated correctly\", function() {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData.id).to.eql(parseInt(pm.environment.get(\"primireId\")));\r",
+									"    pm.expect(jsonData.problemeVizuale).to.eql(\"Zgârieturi ușoare pe aripa stângă și dreapta\");\r",
+									"    pm.expect(jsonData.problemeRaportateClient).to.eql(\"Zgomot la frânare și vibrații la volan\");\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"problemeVizuale\": \"Zgârieturi ușoare pe aripa stângă și dreapta\",\r\n  \"problemeRaportateClient\": \"Zgomot la frânare și vibrații la volan\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/istoric-service/primiri/{{primireId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"istoric-service",
+								"primiri",
+								"{{primireId}}"
+							]
+						},
+						"description": "# Update Istoric Primire\n\nThis endpoint is used to update the details of a specific primire by making an HTTP PUT request to the specified URL.\n\n## Request Body\n\n- `problemeVizuale` (string): Describes the visual issues reported for the primire.\n    \n- `problemeRaportateClient` (string): Specifies the problems reported by the client for the primire.\n    \n\n## Response\n\nThe response for this request will be a JSON object conforming to the following schema:\n\n``` json\n{\n  \"id\": 3,\n  \"programareId\": 5,\n  \"problemeVizuale\": \"Light scratches on the left and right wing\",\n  \"problemeRaportateClient\": \"Noise when braking and steering wheel vibrations\",\n  \"scopVizita\": \"maintenance\",\n  \"createdAt\": \"2024-04-22T13:30:00.000Z\",\n  \"updatedAt\": \"2024-04-22T13:35:00.000Z\"\n}\n\n ```\n\nThe response will contain a `status` field indicating the status of the request, and a `message` field providing additional information about the operation."
+					},
+					"response": []
+				},
+				{
+					"name": "Create Car Processing",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Verifică statusul răspunsului\r",
+									"pm.test(\"Status code is 201\", function() {\r",
+									"    pm.response.to.have.status(201);\r",
+									"});\r",
+									"\r",
+									"// Verifică structura procesării create\r",
+									"pm.test(\"Created processing has required properties\", function() {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData).to.have.property('id');\r",
+									"    pm.expect(jsonData).to.have.property('programareId');\r",
+									"    pm.expect(jsonData).to.have.property('operatiuniEfectuate');\r",
+									"    pm.expect(jsonData).to.have.property('problemeDepistate');\r",
+									"    pm.expect(jsonData).to.have.property('problemeRezolvate');\r",
+									"    pm.expect(jsonData).to.have.property('durataReparatie');\r",
+									"});\r",
+									"\r",
+									"// Verifică dacă datele procesării sunt corecte\r",
+									"pm.test(\"Processing data is correct\", function() {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData.programareId).to.eql(parseInt(pm.environment.get(\"createdProgramareId\")));\r",
+									"    pm.expect(jsonData.operatiuniEfectuate).to.eql(\"Schimb ulei, filtre, verificare și reparare frâne\");\r",
+									"    pm.expect(jsonData.durataReparatie).to.eql(120);\r",
+									"});\r",
+									"\r",
+									"// Salvează ID-ul procesării create pentru teste ulterioare\r",
+									"pm.environment.set(\"procesareId\", pm.response.json().id);"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"programareId\": {{createdProgramareId}},\r\n  \"operatiuniEfectuate\": \"Schimb ulei, filtre, verificare și reparare frâne\",\r\n  \"problemeDepistate\": \"Plăcuțe frână uzate, discuri frână uzate\",\r\n  \"problemeRezolvate\": \"Înlocuire plăcuțe și discuri frână\",\r\n  \"durataReparatie\": 120,\r\n  \"pieseUtilizate\": [\r\n    {\r\n      \"piesaId\": {{piesaId}},\r\n      \"cantitate\": 1\r\n    }\r\n  ]\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/istoric-service/procesari",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"istoric-service",
+								"procesari"
+							]
+						},
+						"description": "### API POST /api/istoric-service/procesari\n\nThis endpoint is used to submit processing data for a specific appointment.\n\n#### Request Body\n\n- `programareId` (required): The ID of the appointment for which the processing data is being submitted.\n    \n\n#### Response\n\nThe response for this request is a JSON object conforming to the following schema:\n\n``` json\n{\n  \"id\": 3,\n  \"programareId\": 5,\n  \"operatiuniEfectuate\": \"Oil change, filters, brake check and repair\",\n  \"problemeDepistate\": \"Worn brake pads, worn brake discs\",\n  \"problemeRezolvate\": \"Replacement of brake pads and discs\",\n  \"durataReparatie\": 120,\n  \"createdAt\": \"2024-04-22T13:40:00.000Z\",\n  \"updatedAt\": \"2024-04-22T13:40:00.000Z\",\n  \"pieseUtilizate\": [\n    {\n      \"id\": 10,\n      \"piesaId\": 1,\n      \"procesareId\": 3,\n      \"cantitate\": 1,\n      \"pret\": 45.99\n    }\n  ]\n}\n\n ```"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Processing by Id",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Verifică statusul răspunsului\r",
+									"pm.test(\"Status code is 200\", function() {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"// Verifică structura procesării\r",
+									"pm.test(\"Processing has required properties\", function() {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData).to.have.property('id');\r",
+									"    pm.expect(jsonData).to.have.property('programareId');\r",
+									"    pm.expect(jsonData).to.have.property('operatiuniEfectuate');\r",
+									"    pm.expect(jsonData).to.have.property('problemeDepistate');\r",
+									"    pm.expect(jsonData).to.have.property('problemeRezolvate');\r",
+									"    pm.expect(jsonData).to.have.property('durataReparatie');\r",
+									"});\r",
+									"\r",
+									"// Verifică dacă ID-ul procesării este corect\r",
+									"pm.test(\"Processing ID is correct\", function() {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData.id).to.eql(parseInt(pm.environment.get(\"procesareId\")));\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/istoric-service/procesari/{{procesareId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"istoric-service",
+								"procesari",
+								"{{procesareId}}"
+							]
+						},
+						"description": "# Retrieve Process Details\n\nThis endpoint retrieves the details of a specific process by making a GET request to the specified URL.\n\n### Request\n\n- `procesareId` (path parameter) : The unique identifier of the process to be retrieved.\n    \n\n### Response\n\nThe response will include the details of the specified process, such as process ID, status, start time, end time, and any other relevant information."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Processing by Appointment Id",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Verifică statusul răspunsului\r",
+									"pm.test(\"Status code is 200\", function() {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"// Verifică structura procesării\r",
+									"pm.test(\"Processing has required properties\", function() {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData).to.have.property('id');\r",
+									"    pm.expect(jsonData).to.have.property('programareId');\r",
+									"    pm.expect(jsonData).to.have.property('operatiuniEfectuate');\r",
+									"    pm.expect(jsonData).to.have.property('problemeDepistate');\r",
+									"    pm.expect(jsonData).to.have.property('problemeRezolvate');\r",
+									"    pm.expect(jsonData).to.have.property('durataReparatie');\r",
+									"});\r",
+									"\r",
+									"// Verifică dacă programarea ID este corectă\r",
+									"pm.test(\"Appointment ID is correct\", function() {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData.programareId).to.eql(parseInt(pm.environment.get(\"createdProgramareId\")));\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/istoric-service/procesari/programare/{{createdProgramareId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"istoric-service",
+								"procesari",
+								"programare",
+								"{{createdProgramareId}}"
+							]
+						},
+						"description": "This endpoint retrieves the processing details for a specific appointment by making an HTTP GET request to the specified URL.\n\n### Request\n\n- Path parameter \"createdProgramareId\": The unique identifier of the appointment for which processing details are to be retrieved.\n    \n\n### Response\n\nThe response will include the processing details for the specified appointment."
+					},
+					"response": []
+				},
+				{
+					"name": "Update Processing",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Verifică statusul răspunsului\r",
+									"pm.test(\"Status code is 200\", function() {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"// Verifică dacă datele procesării sunt actualizate corect\r",
+									"pm.test(\"Processing data is updated correctly\", function() {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData.id).to.eql(parseInt(pm.environment.get(\"procesareId\")));\r",
+									"    pm.expect(jsonData.operatiuniEfectuate).to.eql(\"Schimb ulei, filtre, verificare și reparare frâne, echilibrare roți\");\r",
+									"    pm.expect(jsonData.problemeRezolvate).to.eql(\"Înlocuire plăcuțe și discuri frână, echilibrare roți\");\r",
+									"    pm.expect(jsonData.durataReparatie).to.eql(150);\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"operatiuniEfectuate\": \"Schimb ulei, filtre, verificare și reparare frâne, echilibrare roți\",\r\n  \"problemeRezolvate\": \"Înlocuire plăcuțe și discuri frână, echilibrare roți\",\r\n  \"durataReparatie\": 150\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/istoric-service/procesari/{{procesareId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"istoric-service",
+								"procesari",
+								"{{procesareId}}"
+							]
+						},
+						"description": "### Update Procesare\n\nThis endpoint allows the client to update the processing details for a specific process identified by the `procesareId`.\n\n#### Request Body\n\n- `operatiuniEfectuate` (string): Describes the operations performed during the processing.\n    \n- `problemeRezolvate` (string): Specifies the issues resolved during the processing.\n    \n- `durataReparatie` (number): Indicates the duration of the repair in minutes.\n    \n\n#### Response\n\nThe response for this request will be a JSON object conforming to the following schema:\n\n``` json\n{\n  \"id\": 3,\n  \"programareId\": 5,\n  \"operatiuniEfectuate\": \"Oil change, filters, brake check and repair, wheel balancing\",\n  \"problemeDepistate\": \"Worn brake pads, worn brake discs\",\n  \"problemeRezolvate\": \"Replacement of brake pads and discs, wheel balancing\",\n  \"durataReparatie\": 150,\n  \"createdAt\": \"2024-04-22T13:40:00.000Z\",\n  \"updatedAt\": \"2024-04-22T13:45:00.000Z\",\n  \"pieseUtilizate\": [\n    {\n      \"id\": 10,\n      \"piesaId\": 1,\n      \"procesareId\": 3,\n      \"cantitate\": 1,\n      \"pret\": 45.99\n    }\n  ]\n}\n\n ```"
+					},
+					"response": []
+				},
+				{
+					"name": "Add Car Part to Processing",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Verifică statusul răspunsului\r",
+									"pm.test(\"Status code is 201\", function() {\r",
+									"    pm.response.to.have.status(201);\r",
+									"});\r",
+									"\r",
+									"// Verifică mesajul de confirmare și datele piesei adăugate\r",
+									"pm.test(\"Part addition confirmation\", function() {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData).to.have.property('message');\r",
+									"    pm.expect(jsonData).to.have.property('piesaFolosita');\r",
+									"    pm.expect(jsonData.message).to.include('adăugată');\r",
+									"    pm.expect(jsonData.piesaFolosita.piesaId).to.eql(parseInt(pm.environment.get(\"createdPiesaId\")));\r",
+									"    pm.expect(jsonData.piesaFolosita.cantitate).to.eql(2);\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"piesaId\": {{createdPiesaId}},\r\n  \"cantitate\": 2\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/istoric-service/procesari/{{procesareId}}/piese",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"istoric-service",
+								"procesari",
+								"{{procesareId}}",
+								"piese"
+							]
+						},
+						"description": "This endpoint makes an HTTP POST request to the specified URL to process parts associated with a particular process ID. The request body should include the \"piesaId\" parameter to specify the part ID to be processed.\n\n### Request Body\n\n- piesaId: (object) The ID of the part to be processed.\n    \n\n### Response\n\nThe response will contain the result of the processing operation."
+					},
+					"response": []
+				},
+				{
+					"name": "Remove Car Part from Processing",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Verifică statusul răspunsului\r",
+									"pm.test(\"Status code is 200\", function() {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"// Verifică mesajul de confirmare\r",
+									"pm.test(\"Part removal confirmation\", function() {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData).to.have.property('message');\r",
+									"    pm.expect(jsonData.message).to.include('eliminată');\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/istoric-service/procesari/{{procesareId}}/piese/{{createdPiesaId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"istoric-service",
+								"procesari",
+								"{{procesareId}}",
+								"piese",
+								"{{createdPiesaId}}"
+							]
+						},
+						"description": "### Delete Piese from Procesare\n\nThis endpoint is used to delete a specific \"piesa\" from a \"procesare\".\n\n#### Request\n\n- Method: DELETE\n    \n- URL: `{{baseUrl}}/api/istoric-service/procesari/{{procesareId}}/piese/{{createdPiesaId}}`\n    \n- Path Parameters:\n    \n    - `procesareId` (string, required): The ID of the procesare.\n        \n    - `createdPiesaId` (string, required): The ID of the piesa to be deleted.\n        \n\n#### Response\n\nThe response for this request is a JSON schema, which describes the structure of the response data. The actual response data will conform to this schema."
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "id",
+			"value": "1"
+		},
+		{
+			"key": "base_url",
+			"value": "https://postman-rest-api-learner.glitch.me/"
+		}
+	]
+}

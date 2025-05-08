@@ -1,0 +1,23 @@
+<div class="container-fluid">
+  <div class="row mb-4">
+    <div class="col">
+      <h2>{{ isEditMode ? 'Editare Client' : 'Adăugare Client Nou' }}</h2>
+      <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a [routerLink]="['/clients']">Clienți</a></li>
+          <li class="breadcrumb-item active">{{ isEditMode ? 'Editare' : 'Adăugare' }}</li>
+        </ol>
+      </nav>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-body">
+      <app-form-client
+        [client]="client"
+        [loading]="loading"
+        (formSubmit)="onSubmit($event)"
+      ></app-form-client>
+    </div>
+  </div>
+</div>

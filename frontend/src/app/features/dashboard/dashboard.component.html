@@ -1,0 +1,131 @@
+<div class="row">
+  <div class="col-12">
+    <h2 class="mb-4">Dashboard</h2>
+  </div>
+</div>
+
+<div class="row">
+
+  <div class="col-md-4 mb-4">
+    <div class="card dashboard-card">
+      <div class="card-body">
+        <h5 class="card-title">Clienți</h5>
+        <div class="card-value">{{ totalClients }}</div>
+        <p class="card-text">Total clienți înregistrați</p>
+      </div>
+      <div class="card-footer">
+        <a [routerLink]="['/clients']" class="btn btn-sm btn-primary">
+          <i class="bi bi-people me-1"></i> Administrare Clienți
+        </a>
+      </div>
+    </div>
+  </div>
+
+
+  <div class="col-md-4 mb-4">
+    <div class="card dashboard-card">
+      <div class="card-body">
+        <h5 class="card-title">Mașini</h5>
+        <div class="card-value">{{ totalCars }}</div>
+        <p class="card-text">Total mașini înregistrate</p>
+      </div>
+      <div class="card-footer">
+        <a [routerLink]="['/cars']" class="btn btn-sm btn-primary">
+          <i class="bi bi-car-front me-1"></i> Administrare Mașini
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-4 mb-4">
+    <div class="card dashboard-card">
+      <div class="card-body">
+        <h5 class="card-title">Mașini în Service</h5>
+        <div class="card-value">{{ carsInService }}</div>
+        <p class="card-text">Mașini aflate în service acum</p>
+      </div>
+      <div class="card-footer">
+        <a [routerLink]="['/istoric']" class="btn btn-sm btn-primary">
+          <i class="bi bi-tools me-1"></i> Vezi Istoric Service
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row mt-4">
+  <div class="col-12">
+    <h3 class="mb-3">Programări</h3>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-md-4 mb-4">
+    <div class="card dashboard-card">
+      <div class="card-body">
+        <h5 class="card-title">Programări Astăzi</h5>
+        <div class="card-value">{{ appointmentsToday }}</div>
+        <p class="card-text">Programări pentru ziua de azi</p>
+      </div>
+      <div class="card-footer">
+        <a [routerLink]="['/appointments']" class="btn btn-sm btn-primary">
+          <i class="bi bi-calendar-day me-1"></i> Vezi Programări
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-4 mb-4">
+    <div class="card dashboard-card">
+      <div class="card-body">
+        <h5 class="card-title">Programări Săptămâna Aceasta</h5>
+        <div class="card-value">{{ appointmentsThisWeek }}</div>
+        <p class="card-text">Programări pentru săptămâna curentă</p>
+      </div>
+      <div class="card-footer">
+        <a [routerLink]="['/appointments']" class="btn btn-sm btn-primary">
+          <i class="bi bi-calendar-week me-1"></i> Vezi Programări
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-4 mb-4">
+    <div class="card dashboard-card">
+      <div class="card-body">
+        <h5 class="card-title">Programări Luna Aceasta</h5>
+        <div class="card-value">{{ appointmentsThisMonth }}</div>
+        <p class="card-text">Programări pentru luna curentă</p>
+      </div>
+      <div class="card-footer">
+        <a [routerLink]="['/appointments']" class="btn btn-sm btn-primary">
+          <i class="bi bi-calendar-month me-1"></i> Vezi Programări
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- <div class="row mt-4">
+  <div class="col-12">
+    <h3 class="mb-3">Activitate Recentă</h3>
+  </div>
+  <div class="col-12">
+    <div class="card">
+      <div class="card-body">
+        <p *ngIf="loading" class="text-center py-4">Se încarcă activitatea recentă...</p>
+        <p *ngIf="!loading && istoricCompletate === 0" class="text-center py-4">Nu există activitate recentă de afișat.</p>
+
+        <div *ngIf="!loading && istoricCompletate > 0" class="d-flex justify-content-between align-items-center">
+          <div>
+            <h5 class="mb-0">Lucrări finalizate</h5>
+            <p class="text-muted mb-0">Total: {{ istoricCompletate }}</p>
+          </div>
+          <a [routerLink]="['/istoric']" class="btn btn-outline-primary">
+            <i class="bi bi-arrow-right"></i> Vezi toate
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div> -->

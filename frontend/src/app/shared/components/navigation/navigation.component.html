@@ -1,0 +1,13 @@
+<nav class="sidebar">
+  <div class="sidebar-header">
+    <span class="sidebar-brand">Service Auto</span>
+  </div>
+  <ul class="sidebar-menu">
+    <li *ngFor="let item of navItems" class="sidebar-menu-item">
+      <a [routerLink]="item.link" routerLinkActive="active" class="sidebar-menu-link">
+        <i class="bi {{item.icon}}"></i>
+        <span>{{item.title}}</span>
+      </a>
+    </li>
+  </ul>
+</nav>

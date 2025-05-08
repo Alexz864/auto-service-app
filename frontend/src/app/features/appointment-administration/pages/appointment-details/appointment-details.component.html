@@ -1,0 +1,121 @@
+<div class="container-fluid">
+  <div class="row mb-4">
+    <div class="col">
+      <h2>Detalii Programare</h2>
+      <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a [routerLink]="['/appointments']">Programări</a></li>
+          <li class="breadcrumb-item active">Detalii</li>
+        </ol>
+      </nav>
+    </div>
+    <div class="col-auto">
+      <div class="btn-group">
+        <a [routerLink]="['/appointments', appointmentId, 'edit']" class="btn btn-primary" *ngIf="appointment?.status === 'programat'">
+          <i class="bi bi-pencil me-1"></i> Editează
+        </a>
+        <button
+          *ngIf="appointment?.status === 'programat'"
+          (click)="onCancelAppointment()"
+          class="btn btn-warning">
+          <i class="bi bi-x-circle me-1"></i> Anulează
+        </button>
+        <button
+          *ngIf="appointment?.status === 'anulat' || appointment?.status === 'finalizat'"
+          (click)="onDeleteAppointment()"
+          class="btn btn-danger">
+          <i class="bi bi-trash me-1"></i> Șterge
+        </button>
+        <a
+          *ngIf="appointment?.status === 'programat' && !areIstoric"
+          [routerLink]="['/istoric/add']"
+          [queryParams]="{appointmentId: appointmentId}"
+          class="btn btn-success">
+          <i class="bi bi-tools me-1"></i> Primire Mașină
+        </a>
+        <a
+          *ngIf="areIstoric"
+          [routerLink]="['/istoric']"
+          [queryParams]="{appointmentId: appointmentId}"
+          class="btn btn-info">
+          <i class="bi bi-clock-history me-1"></i> Vezi Istoric
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="loading" class="d-flex justify-content-center my-5">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Se încarcă...</span>
+    </div>
+  </div>
+
+  <div *ngIf="!loading && appointment">
+    <div class="row">
+      <div class="col-md-4">
+        <div class="card mb-4">
+          <div class="card-header">
+            <h5 class="card-title mb-0">Informații Programare</h5>
+          </div>
+          <div class="card-body">
+            <div class="appointment-status mb-3">
+              <span class="badge" [ngClass]="{
+                'bg-success': appointment.status === 'finalizat',
+                'bg-warning': appointment.status === 'in lucru',
+                'bg-info': appointment.status === 'programat',
+                'bg-danger': appointment.status === 'anulat'
+              }">
+                {{ appointment.status }}
+              </span>
+            </div>
+
+            <div class="programare-info">
+              <div class="info-group">
+                <label>Data Programării:</label>
+                <p>{{ appointment.date | date:'dd.MM.yyyy' }}</p>
+              </div>
+
+              <div class="info-group">
+                <label>Interval Orar:</label>
+                <p>
+                  {{ appointment.date | date:'HH:mm' }} -
+                  {{ calculateFinishDate(appointment.date, appointment.time) | date:'HH:mm' }}
+                </p>
+              </div>
+
+              <div class="info-group">
+                <label>Modalitate Programare:</label>
+                <p>{{ getMethodLabel(appointment.contactMethod) }}</p>
+              </div>
+
+              <div class="info-group">
+                <label>Client:</label>
+                <p>
+                  <a [routerLink]="['/clients', appointment.clientId]">{{ clientName }}</a>
+                </p>
+              </div>
+
+              <div class="info-group">
+                <label>Mașină:</label>
+                <p>
+                  <a [routerLink]="['/cars', appointment.carId]">{{ carDetails }}</a>
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-8">
+        <div class="card">
+          <div class="card-header">
+            <h5 class="card-title mb-0">Descriere Problemă</h5>
+          </div>
+          <div class="card-body">
+            <p class="card-text">{{ appointment.problemDescription }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

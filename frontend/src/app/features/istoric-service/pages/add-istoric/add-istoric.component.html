@@ -1,0 +1,204 @@
+<div class="container-fluid">
+  <div class="row mb-4">
+    <div class="col">
+      <h2>Adăugare Istoric Service</h2>
+      <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a [routerLink]="['/istoric']">Istoric</a></li>
+          <li class="breadcrumb-item active">Adăugare</li>
+        </ol>
+      </nav>
+    </div>
+    <div class="col-auto">
+      <div class="btn-group">
+        <a [routerLink]="['/appointments', appointmentId]" class="btn btn-secondary">
+          <i class="bi bi-arrow-left me-1"></i> Înapoi la Programare
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="loading" class="d-flex justify-content-center my-5">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Se încarcă...</span>
+    </div>
+  </div>
+
+  <div *ngIf="!loading && appointment">
+    <div class="row mb-4">
+      <div class="col-md-4">
+        <div class="card">
+          <div class="card-header">
+            <h5 class="card-title mb-0">Informații Programare</h5>
+          </div>
+          <div class="card-body">
+            <div class="info-group">
+              <label>Client:</label>
+              <p>{{ clientName }}</p>
+            </div>
+
+            <div class="info-group">
+              <label>Mașină:</label>
+              <p>{{ carDetails }}</p>
+            </div>
+
+            <div class="info-group">
+              <label>Data Programării:</label>
+              <p>{{ appointment.date | date:'dd.MM.yyyy' }}</p>
+            </div>
+
+            <div class="info-group">
+              <label>Interval Orar:</label>
+              <p>{{ appointment.date | date:'HH:mm' }} - {{ calculateFinishDate(appointment.date, appointment.time) | date:'HH:mm' }}</p>
+            </div>
+
+            <div class="info-group">
+              <label>Descriere Problema:</label>
+              <p>{{ appointment.problemDescription }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-8">
+        <div class="accordion" id="istoricAccordion">
+          <div class="accordion-item">
+            <h2 class="accordion-header" id="headingReceive">
+              <button
+                class="accordion-button"
+                [ngClass]="{'collapsed': !activePanelReceive}"
+                type="button"
+                data-bs-toggle="collapse"
+                data-bs-target="#collapseReceive"
+                [attr.aria-expanded]="activePanelReceive"
+                aria-controls="collapseReceive"
+                [disabled]="receiveCar !== null"
+              >
+                <div class="d-flex align-items-center w-100">
+                  <span class="flex-grow-1">1. Primire Mașină</span>
+                  <span *ngIf="receiveCar !== null" class="badge bg-success ms-2">Completat</span>
+                </div>
+              </button>
+            </h2>
+            <div
+              id="collapseReceive"
+              class="accordion-collapse collapse"
+              [ngClass]="{'show': activePanelReceive}"
+              aria-labelledby="headingReceive"
+              data-bs-parent="#istoricAccordion"
+            >
+              <div class="accordion-body">
+                <div *ngIf="receiveCar !== null">
+                  <div class="alert alert-success mb-3">
+                    <i class="bi bi-check-circle me-2"></i> Datele primirii mașinii au fost completate!
+                  </div>
+
+                  <div class="mb-3">
+                    <label class="form-label fw-bold">Probleme vizuale identificate:</label>
+                    <p>{{ receiveCar.visualProblems }}</p>
+                  </div>
+
+                  <div class="mb-3">
+                    <label class="form-label fw-bold">Probleme raportate de client:</label>
+                    <p>{{ receiveCar.clientReportedProblems }}</p>
+                  </div>
+
+                  <div class="mb-3">
+                    <label class="form-label fw-bold">Scopul vizitei:</label>
+                    <p>{{ receiveCar.purpose }}</p>
+                  </div>
+                </div>
+
+                <app-car-receive-form
+                  *ngIf="receiveCar === null"
+                  [appointmentId]="appointmentId"
+                  [loading]="loadingReceive"
+                  (formSubmit)="onReceiveCarSubmit($event)"
+                ></app-car-receive-form>
+              </div>
+            </div>
+          </div>
+
+          <div class="accordion-item">
+            <h2 class="accordion-header" id="headingProcessing">
+              <button
+                class="accordion-button collapsed"
+                [ngClass]="{'collapsed': !activePanelProcessing}"
+                type="button"
+                data-bs-toggle="collapse"
+                data-bs-target="#collapseProcessing"
+                [attr.aria-expanded]="activePanelProcessing"
+                aria-controls="collapseProcessing"
+                [disabled]="receiveCar === null || processingCar !== null"
+              >
+                <div class="d-flex align-items-center w-100">
+                  <span class="flex-grow-1">2. Procesare Mașină</span>
+                  <span *ngIf="processingCar !== null" class="badge bg-success ms-2">Completat</span>
+                  <span *ngIf="receiveCar === null" class="badge bg-warning ms-2">Blocat - Completați primirea</span>
+                </div>
+              </button>
+            </h2>
+            <div
+              id="collapseProcessing"
+              class="accordion-collapse collapse"
+              [ngClass]="{'show': activePanelProcessing}"
+              aria-labelledby="headingProcessinge"
+              data-bs-parent="#istoricAccordion"
+            >
+              <div class="accordion-body">
+                <div *ngIf="receiveCar === null" class="alert alert-warning">
+                  <i class="bi bi-exclamation-triangle me-2"></i> Trebuie să completați datele primirii mașinii înainte de a completa datele procesării!
+                </div>
+
+                <div *ngIf="processingCar !== null">
+                  <div class="alert alert-success mb-3">
+                    <i class="bi bi-check-circle me-2"></i> Datele procesării mașinii au fost completate! Lucrarea a fost finalizată.
+                  </div>
+
+                  <div class="mb-3">
+                    <label class="form-label fw-bold">Operațiuni efectuate:</label>
+                    <p>{{ processingCar.operationsDone }}</p>
+                  </div>
+
+                  <div class="mb-3">
+                    <label class="form-label fw-bold">Piese schimbate:</label>
+                    <ul *ngIf="processingCar.usedParts && processingCar.usedParts.length > 0">
+                      <li *ngFor="let part of processingCar.usedParts">
+                        {{ part.partId }} - {{ part.quantity }} buc.
+                      </li>
+                    </ul>
+                    <p *ngIf="!processingCar.usedParts || processingCar.usedParts.length === 0">
+                      Nu s-au schimbat piese.
+                    </p>
+                  </div>
+
+                  <div class="mb-3">
+                    <label class="form-label fw-bold">Probleme depistate:</label>
+                    <p>{{ processingCar.foundProblems }}</p>
+                  </div>
+
+                  <div class="mb-3">
+                    <label class="form-label fw-bold">Probleme rezolvate:</label>
+                    <p>{{ processingCar.solvedProblems }}</p>
+                  </div>
+
+                  <div class="mb-3">
+                    <label class="form-label fw-bold">Durata reparației:</label>
+                    <p>{{ processingCar.serviceTime }} minute</p>
+                  </div>
+                </div>
+
+                <app-processing-car-form
+                  *ngIf="receiveCar !== null && processingCar === null"
+                  [appointmentId]="appointmentId"
+                  [loading]="loadingProcessing"
+                  (formSubmit)="onProcessingCarSubmit($event)"
+                ></app-processing-car-form>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

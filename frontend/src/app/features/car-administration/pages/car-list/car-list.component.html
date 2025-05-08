@@ -1,0 +1,101 @@
+<div class="container-fluid">
+  <div class="row mb-4">
+    <div class="col">
+      <h2>Administrare Mașini</h2>
+    </div>
+    <div class="col-auto">
+      <a [routerLink]="['/cars/add']" class="btn btn-primary">
+        <i class="bi bi-plus-circle me-1"></i> Adaugă Mașină Nouă
+      </a>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-body">
+      <div class="row mb-3">
+        <div class="col-md-6">
+          <div class="input-group">
+            <input
+              type="text"
+              class="form-control"
+              placeholder="Caută după număr înmatriculare, marcă, model sau serie șasiu..."
+              [(ngModel)]="searchTerm"
+              (keyup.enter)="onSearch()"
+            >
+            <button class="btn btn-outline-secondary" type="button" (click)="onSearch()">
+              <i class="bi bi-search"></i>
+            </button>
+          </div>
+        </div>
+        <div class="col-md-6 text-md-end mt-3 mt-md-0">
+          <div class="form-check form-switch d-inline-block ms-3">
+            <input class="form-check-input" type="checkbox" id="showInactive" [ngModel]="showInactive" (change)="toggleShowInactive()">
+            <label class="form-check-label" for="showInactive">Afișează mașini inactive</label>
+          </div>
+        </div>
+      </div>
+
+      <div *ngIf="loading" class="d-flex justify-content-center my-5">
+        <div class="spinner-border text-primary" role="status">
+          <span class="visually-hidden">Se încarcă...</span>
+        </div>
+      </div>
+
+      <div *ngIf="!loading && filteredCars.length === 0" class="alert alert-info">
+        Nu a fost găsită nicio mașină care să corespundă criteriilor de căutare.
+      </div>
+
+      <div *ngIf="!loading && filteredCars.length > 0" class="table-responsive">
+        <table class="table table-hover">
+          <thead>
+            <tr>
+              <th>Număr Înmatriculare</th>
+              <th>Marcă / Model</th>
+              <th>An Fabricație</th>
+              <th>Motorizare</th>
+              <th>Status</th>
+              <th>Acțiuni</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let car of filteredCars">
+              <td>{{ car.registrationNumber }}</td>
+              <td>{{ car.brand }} {{ car.model }}</td>
+              <td>{{ car.yearOfManufacture }}</td>
+              <td>
+                {{ car.engineType }} / {{ car.engineCapacity }} cm³ / {{ car.horsePower }} CP
+              </td>
+              <td>
+                <span class="badge" [ngClass]="car.activa ? 'bg-success' : 'bg-danger'">
+                  {{ car.activa ? 'Activ' : 'Inactiv' }}
+                </span>
+              </td>
+              <td>
+                <div class="btn-group">
+                  <a [routerLink]="['/cars', car.id]" class="btn btn-sm btn-info" title="Detalii">
+                    <i class="bi bi-info-circle"></i>
+                  </a>
+                  <a [routerLink]="['/cars', car.id, 'edit']" class="btn btn-sm btn-warning" title="Editează">
+                    <i class="bi bi-pencil"></i>
+                  </a>
+                  <a [routerLink]="['/appointments/add']" [queryParams]="{car: car.id}" class="btn btn-sm btn-success" title="Programare">
+                    <i class="bi bi-calendar-plus"></i>
+                  </a>
+                  <button *ngIf="car.activa" (click)="onDeactivateCar(car.id!)" class="btn btn-sm btn-secondary" title="Dezactivează">
+                    <i class="bi bi-x-circle"></i>
+                  </button>
+                  <button *ngIf="!car.activa" (click)="onActivateCar(car.id!)" class="btn btn-sm btn-success" title="Activează">
+                    <i class="bi bi-check-circle"></i>
+                  </button>
+                  <button (click)="onDeleteCar(car.id!)" class="btn btn-sm btn-danger" title="Șterge">
+                    <i class="bi bi-trash"></i>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,115 @@
+<div class="container-fluid">
+  <div class="row mb-4">
+    <div class="col">
+      <h2>Administrare Piese</h2>
+    </div>
+    <div class="col-auto">
+      <a [routerLink]="['/parts/add']" class="btn btn-primary">
+        <i class="bi bi-plus-circle me-1"></i> Adaugă Piesă Nouă
+      </a>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-body">
+      <div class="row mb-3">
+        <div class="col-md-4">
+          <div class="input-group">
+            <input
+              type="text"
+              class="form-control"
+              placeholder="Caută după nume sau cod..."
+              [(ngModel)]="searchTerm"
+              (keyup.enter)="onSearch()"
+            >
+            <button class="btn btn-outline-secondary" type="button" (click)="onSearch()">
+              <i class="bi bi-search"></i>
+            </button>
+          </div>
+        </div>
+        <div class="col-md-8 text-md-end mt-3 mt-md-0">
+          <div class="form-check form-switch d-inline-block me-3">
+            <input class="form-check-input" type="checkbox" id="showOutOfStock" [(ngModel)]="showOutOfStock" (change)="applyFilters()">
+            <label class="form-check-label" for="showOutOfStock">Afișează piese fără stoc</label>
+          </div>
+          <div class="form-check form-switch d-inline-block">
+            <input class="form-check-input" type="checkbox" id="showInactive" [ngModel]="showInactive" (change)="toggleShowInactive()">
+            <label class="form-check-label" for="showInactive">Afișează piese inactive</label>
+          </div>
+        </div>
+      </div>
+
+      <div *ngIf="loading" class="d-flex justify-content-center my-5">
+        <div class="spinner-border text-primary" role="status">
+          <span class="visually-hidden">Se încarcă...</span>
+        </div>
+      </div>
+
+      <div *ngIf="!loading && filteredParts.length === 0" class="alert alert-info">
+        Nu a fost găsită nicio piesă care să corespundă criteriilor de căutare.
+      </div>
+
+      <div *ngIf="!loading && filteredParts.length > 0" class="table-responsive">
+        <table class="table table-hover">
+          <thead>
+            <tr>
+              <th>Nume</th>
+              <th>Cod</th>
+              <th>Descriere</th>
+              <th>Preț</th>
+              <th>Stoc</th>
+              <th>Status</th>
+              <th>Acțiuni</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let part of filteredParts">
+              <td>{{ part.name }}</td>
+              <td>{{ part.code }}</td>
+              <td>{{ part.description }}</td>
+              <td>{{ part.price | currency:'RON ' }}</td>
+              <td>
+                <span
+                  [ngClass]="{
+                    'text-success': part.stock > 10,
+                    'text-warning': part.stock > 0 && part.stock <= 10,
+                    'text-danger': part.stock <= 0
+                  }"
+                >
+                  {{ part.stock }}
+                </span>
+                <button class="btn btn-sm btn-link" (click)="onUpdateStock(part.id!, part.stock)">
+                  <i class="bi bi-pencil-square"></i>
+                </button>
+              </td>
+              <td>
+                <span class="badge" [ngClass]="part.activa ? 'bg-success' : 'bg-danger'">
+                  {{ part.activa ? 'Activ' : 'Inactiv' }}
+                </span>
+              </td>
+              <td>
+                <div class="btn-group">
+                  <a [routerLink]="['/parts', part.id]" class="btn btn-sm btn-info" title="Detalii">
+                    <i class="bi bi-info-circle"></i>
+                  </a>
+                  <a [routerLink]="['/parts', part.id, 'edit']" class="btn btn-sm btn-warning" title="Editează">
+                    <i class="bi bi-pencil"></i>
+                  </a>
+                  <button *ngIf="part.activa" (click)="onDeactivatePart(part.id!)" class="btn btn-sm btn-secondary" title="Dezactivează">
+                    <i class="bi bi-x-circle"></i>
+                  </button>
+                  <button *ngIf="!part.activa" (click)="onActivatePart(part.id!)" class="btn btn-sm btn-success" title="Activează">
+                    <i class="bi bi-check-circle"></i>
+                  </button>
+                  <button (click)="onDeletePart(part.id!)" class="btn btn-sm btn-danger" title="Șterge">
+                    <i class="bi bi-trash"></i>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>

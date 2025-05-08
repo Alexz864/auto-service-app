@@ -1,0 +1,181 @@
+<div class="container-fluid">
+  <div class="row mb-4">
+    <div class="col">
+      <h2>Detalii Mașină</h2>
+      <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a [routerLink]="['/cars']">Mașini</a></li>
+          <li class="breadcrumb-item active">Detalii</li>
+        </ol>
+      </nav>
+    </div>
+    <div class="col-auto">
+      <div class="btn-group">
+        <a [routerLink]="['/cars', carId, 'edit']" class="btn btn-primary">
+          <i class="bi bi-pencil me-1"></i> Editează
+        </a>
+        <button *ngIf="car?.activa" (click)="onDeactivateCar()" class="btn btn-warning">
+          <i class="bi bi-x-circle me-1"></i> Dezactivează
+        </button>
+        <button *ngIf="car && !car.activa" (click)="onActivateCar()" class="btn btn-success">
+          <i class="bi bi-check-circle me-1"></i> Activează
+        </button>
+        <button (click)="onDeleteCar()" class="btn btn-danger">
+          <i class="bi bi-trash me-1"></i> Șterge
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="loading" class="d-flex justify-content-center my-5">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Se încarcă...</span>
+    </div>
+  </div>
+
+  <div *ngIf="!loading && car">
+    <div class="row">
+
+      <div class="col-md-4">
+        <div class="card mb-4">
+          <div class="card-header">
+            <h5 class="card-title mb-0">Informații Mașină</h5>
+          </div>
+          <div class="card-body">
+            <div class="car-status mb-3">
+              <span class="badge" [ngClass]="car.activa ? 'bg-success' : 'bg-danger'">
+                {{ car.activa ? 'Activă' : 'Inactivă' }}
+              </span>
+            </div>
+
+            <div class="car-info">
+              <div class="info-group">
+                <label>Număr Înmatriculare:</label>
+                <p class="font-weight-bold">{{ car.registrationNumber }}</p>
+              </div>
+
+              <div class="info-group">
+                <label>Marca / Model:</label>
+                <p>{{ car.brand }} {{ car.model }}</p>
+              </div>
+
+              <div class="info-group">
+                <label>Serie Șasiu:</label>
+                <p>{{ car.chassisSeries }}</p>
+              </div>
+
+              <div class="info-group">
+                <label>An Fabricație:</label>
+                <p>{{ car.yearOfManufacture }}</p>
+              </div>
+
+              <div class="info-group">
+                <label>Motorizare:</label>
+                <p>{{ car.engineType | titlecase }}</p>
+              </div>
+
+              <div class="info-group">
+                <label>Specificații Motor:</label>
+                <p>{{ car.engineCapacity }} cm³ / {{ car.horsePower }} CP / {{ car.kW.toFixed(1).replace('.', ',') }} kW</p>
+              </div>
+
+              <div class="info-group" *ngIf="client">
+                <label>Proprietar:</label>
+                <p>
+                  <a [routerLink]="['/clients', client.id]">{{ client.last_name }} {{ client.first_name }}</a>
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+
+        <div class="card mb-4">
+          <div class="card-header">
+            <h5 class="card-title mb-0">Acțiuni Rapide</h5>
+          </div>
+          <div class="card-body">
+            <div class="d-grid gap-2">
+              <a [routerLink]="['/appointments/add']" [queryParams]="{carId: carId}" class="btn btn-success">
+                <i class="bi bi-calendar-plus me-1"></i> Creează Programare
+              </a>
+              <a [routerLink]="['/clients', car.clientId]" class="btn btn-info">
+                <i class="bi bi-person me-1"></i> Vezi Detalii Proprietar
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-8">
+        <div class="card mb-4">
+          <div class="card-header d-flex justify-content-between align-items-center">
+            <h5 class="card-title mb-0">Programări Recente</h5>
+            <div>
+              <a [routerLink]="['/appointments']" [queryParams]="{carId: carId}" class="btn btn-sm btn-info me-2">
+                <i class="bi bi-calendar me-1"></i> Toate Programările
+              </a>
+              <a [routerLink]="['/appointments/add']" [queryParams]="{carId: carId}" class="btn btn-sm btn-primary">
+                <i class="bi bi-plus-circle me-1"></i> Programare Nouă
+              </a>
+            </div>
+          </div>
+          <div class="card-body">
+            <div *ngIf="recentAppointments.length === 0" class="alert alert-info mb-0">
+              Nu există programări recente pentru această mașină.
+            </div>
+            <div *ngIf="recentAppointments.length > 0" class="table-responsive">
+              <table class="table table-hover">
+                <thead>
+                  <tr>
+                    <th>Data</th>
+                    <th>Ora</th>
+                    <th>Problema</th>
+                    <th>Status</th>
+                    <th>Acțiuni</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let appointment of recentAppointments">
+                    <td>{{ appointment.date | date:'dd.MM.yyyy' }}</td>
+                    <td>{{ appointment.date | date:'HH:mm' }} - {{ calculateFinishDate(appointment.date, appointment.time) | date:'HH:mm' }}</td>
+                    <td>{{ appointment.problemDescription | slice:0:50 }}{{ appointment.problemDescription.length > 50 ? '...' : '' }}</td>
+                    <td>
+                      <span class="badge" [ngClass]="{
+                        'bg-success': appointment.status === 'finalizat',
+                        'bg-warning': appointment.status === 'in-progres',
+                        'bg-info': appointment.status === 'programat',
+                        'bg-danger': appointment.status === 'anulat'
+                      }">
+                        {{ appointment.status }}
+                      </span>
+                    </td>
+                    <td>
+                      <a [routerLink]="['/appointments', appointment.id]" class="btn btn-sm btn-info">
+                        <i class="bi bi-eye"></i>
+                      </a>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header d-flex justify-content-between align-items-center">
+            <h5 class="card-title mb-0">Istoric Service</h5>
+            <a [routerLink]="['/istoric']" [queryParams]="{carId: carId}" class="btn btn-sm btn-primary">
+              <i class="bi bi-clock-history me-1"></i> Vezi Istoric Complet
+            </a>
+          </div>
+          <div class="card-body">
+            <div class="alert alert-info mb-0">
+              Nu există înregistrări de service pentru această mașină.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

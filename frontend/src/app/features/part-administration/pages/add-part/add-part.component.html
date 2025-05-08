@@ -1,0 +1,23 @@
+<div class="container-fluid">
+  <div class="row mb-4">
+    <div class="col">
+      <h2>{{ isEditMode ? 'Editare Piesă' : 'Adăugare Piesă Nouă' }}</h2>
+      <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a [routerLink]="['/parts']">Piese</a></li>
+          <li class="breadcrumb-item active">{{ isEditMode ? 'Editare' : 'Adăugare' }}</li>
+        </ol>
+      </nav>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-body">
+      <app-part-form
+        [part]="part"
+        [loading]="loading"
+        (formSubmit)="onSubmit($event)"
+      ></app-part-form>
+    </div>
+  </div>
+</div>

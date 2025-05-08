@@ -1,0 +1,66 @@
+<form [formGroup]="receiveForm" (ngSubmit)="onSubmit()">
+  <div class="mb-3">
+    <div class="form-floating">
+      <textarea
+        class="form-control"
+        id="visualProblems"
+        formControlName="visualProblems"
+        placeholder="Probleme vizuale identificate"
+        style="height: 100px"
+        [ngClass]="{'is-invalid': receiveForm.get('visualProblems')?.invalid && receiveForm.get('visualProblems')?.touched}"
+      ></textarea>
+      <label for="visualProblems">Probleme vizuale identificate*</label>
+      <div class="invalid-feedback" *ngIf="receiveForm.get('visualProblems')?.invalid && receiveForm.get('visualProblems')?.touched">
+        <span *ngIf="receiveForm.get('visualProblems')?.errors?.['required']">Acest câmp este obligatoriu.</span>
+        <span *ngIf="receiveForm.get('visualProblems')?.errors?.['minlength']">Descrierea trebuie să aibă minim 5 caractere.</span>
+        <span *ngIf="receiveForm.get('visualProblems')?.errors?.['maxlength']">Descrierea nu poate depăși 500 de caractere.</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="mb-3">
+    <div class="form-floating">
+      <textarea
+        class="form-control"
+        id="clientReportedProblems"
+        formControlName="clientReportedProblems"
+        placeholder="Probleme raportate de client"
+        style="height: 100px"
+        [ngClass]="{'is-invalid': receiveForm.get('clientReportedProblems')?.invalid && receiveForm.get('clientReportedProblems')?.touched}"
+      ></textarea>
+      <label for="clientReportedProblems">Probleme raportate de client*</label>
+      <div class="invalid-feedback" *ngIf="receiveForm.get('clientReportedProblems')?.invalid && receiveForm.get('clientReportedProblems')?.touched">
+        <span *ngIf="receiveForm.get('clientReportedProblems')?.errors?.['required']">Acest câmp este obligatoriu.</span>
+        <span *ngIf="receiveForm.get('clientReportedProblems')?.errors?.['minlength']">Descrierea trebuie să aibă minim 5 caractere.</span>
+        <span *ngIf="receiveForm.get('clientReportedProblems')?.errors?.['maxlength']">Descrierea nu poate depăși 500 de caractere.</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="mb-3">
+    <div class="form-floating">
+      <select
+        class="form-select"
+        id="purpose"
+        formControlName="purpose"
+        [ngClass]="{'is-invalid': receiveForm.get('purpose')?.invalid && receiveForm.get('purpose')?.touched}"
+      >
+        <option value="" disabled>Selectați scopul vizitei</option>
+        <option value="verificare">Verificare</option>
+        <option value="revizie">Revizie</option>
+        <option value="reparatie">Reparație</option>
+      </select>
+      <label for="purpose">Scopul vizitei*</label>
+      <div class="invalid-feedback" *ngIf="receiveForm.get('purpose')?.invalid && receiveForm.get('purpose')?.touched">
+        <span *ngIf="receiveForm.get('purpose')?.errors?.['required']">Acest câmp este obligatoriu.</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+    <button type="submit" class="btn btn-primary" [disabled]="loading">
+      <span *ngIf="loading" class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
+      Salvează
+    </button>
+  </div>
+</form>

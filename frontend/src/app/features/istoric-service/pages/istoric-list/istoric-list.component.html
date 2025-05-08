@@ -1,0 +1,108 @@
+<div class="container-fluid">
+  <div class="row mb-4">
+    <div class="col">
+      <h2>Istoric Service</h2>
+    </div>
+    <div class="col-auto">
+      <a [routerLink]="['/appointments']" class="btn btn-primary">
+        <i class="bi bi-calendar-plus me-1"></i> Vezi Programări
+      </a>
+    </div>
+  </div>
+
+
+    <div class="card">
+      <div class="card-body">
+        <div class="row mb-3">
+          <div class="col-md-5">
+            <div class="input-group">
+              <input
+                type="text"
+                class="form-control"
+                placeholder="Caută după client sau mașină..."
+                [(ngModel)]="searchTerm"
+                (keyup.enter)="onSearch()"
+              >
+              <button class="btn btn-outline-secondary" type="button" (click)="onSearch()">
+                <i class="bi bi-search"></i>
+              </button>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <select class="form-select" [(ngModel)]="selectedStatus" (change)="applyFilters()">
+              <option value="">Toate statusurile</option>
+              <option value="in-progres">În progres</option>
+              <option value="finalizat">Finalizat</option>
+            </select>
+          </div>
+          <div class="col-md-3 text-end">
+            <button class="btn btn-outline-secondary" (click)="clearFilters()">
+              <i class="bi bi-x-circle me-1"></i> Resetează
+            </button>
+          </div>
+        </div>
+
+        <div *ngIf="loading" class="d-flex justify-content-center my-5">
+          <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Se încarcă...</span>
+          </div>
+        </div>
+
+        <div *ngIf="!loading && filteredIstoricItems.length === 0" class="alert alert-info">
+          Nu a fost găsită nicio înregistrare de istoric care să corespundă criteriilor de căutare.
+        </div>
+
+        <div *ngIf="!loading && filteredIstoricItems.length > 0" class="table-responsive">
+          <table class="table table-hover">
+            <thead>
+              <tr>
+                <th>Data</th>
+                <th>Client</th>
+                <th>Mașină</th>
+                <th>Status</th>
+                <th>Primire</th>
+                <th>Procesare</th>
+                <th>Acțiuni</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let item of filteredIstoricItems">
+                <td>{{ item.appointmentDate | date:'dd.MM.yyyy' }}</td>
+                <td>{{ item.clientName }}</td>
+                <td>{{ item.carDetails }}</td>
+                <td>
+                  <span class="badge" [ngClass]="{
+                    'bg-success': item.istoric.status === 'finalizat',
+                    'bg-warning': item.istoric.status === 'in lucru'
+                  }">
+                    {{ item.istoric.status }}
+                  </span>
+                </td>
+                <td>
+                  <span *ngIf="item.istoric.receiveCar" class="badge bg-success">
+                    <i class="bi bi-check"></i> Completat
+                  </span>
+                  <span *ngIf="!item.istoric.receiveCar" class="badge bg-danger">
+                    <i class="bi bi-x"></i> Necompletat
+                  </span>
+                </td>
+                <td>
+                  <span *ngIf="item.istoric.processingCar" class="badge bg-success">
+                    <i class="bi bi-check"></i> Completat
+                  </span>
+                  <span *ngIf="!item.istoric.processingCar" class="badge bg-danger">
+                    <i class="bi bi-x"></i> Necompletat
+                  </span>
+                </td>
+                <td>
+                  <a [routerLink]="['/istoric', item.istoric.appointmentId]" class="btn btn-sm btn-info" title="Detalii">
+                    <i class="bi bi-info-circle"></i>
+                  </a>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>

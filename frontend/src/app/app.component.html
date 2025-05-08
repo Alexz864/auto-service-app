@@ -1,0 +1,13 @@
+<div class="app-container d-flex flex-column min-vh-100">
+  <app-navigation></app-navigation>
+  <div class="content-container d-flex flex-column flex-grow-1">
+    <app-header></app-header>
+    <main class="main-content flex-grow-1">
+      <div class="container-fluid p-4">
+        <router-outlet></router-outlet>
+      </div>
+    </main>
+    <app-footer></app-footer>
+  </div>
+  <app-alert></app-alert>
+</div>

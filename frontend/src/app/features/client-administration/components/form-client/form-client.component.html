@@ -1,0 +1,107 @@
+<form [formGroup]="clientForm" (ngSubmit)="onSubmit()">
+  <div class="row mb-3">
+    <div class="col-md-6">
+      <div class="form-floating">
+        <input
+          type="text"
+          class="form-control"
+          id="last_name"
+          formControlName="last_name"
+          placeholder="Nume"
+          [ngClass]="{'is-invalid': clientForm.get('last_name')?.invalid && clientForm.get('last_name')?.touched}"
+        >
+        <label for="last_name">Nume*</label>
+        <div class="invalid-feedback" *ngIf="clientForm.get('last_name')?.invalid && clientForm.get('last_name')?.touched">
+          <span *ngIf="clientForm.get('last_name')?.errors?.['required']">Numele este obligatoriu.</span>
+          <span *ngIf="clientForm.get('last_name')?.errors?.['minlength']">Numele trebuie să aibă cel puțin 2 caractere.</span>
+          <span *ngIf="clientForm.get('last_name')?.errors?.['maxlength']">Numele nu poate depăși 50 de caractere.</span>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-6">
+      <div class="form-floating">
+        <input
+          type="text"
+          class="form-control"
+          id="first_name"
+          formControlName="first_name"
+          placeholder="Prenume"
+          [ngClass]="{'is-invalid': clientForm.get('first_name')?.invalid && clientForm.get('first_name')?.touched}"
+        >
+        <label for="first_name">Prenume*</label>
+        <div class="invalid-feedback" *ngIf="clientForm.get('first_name')?.invalid && clientForm.get('first_name')?.touched">
+          <span *ngIf="clientForm.get('first_name')?.errors?.['required']">Prenumele este obligatoriu.</span>
+          <span *ngIf="clientForm.get('first_name')?.errors?.['minlength']">Prenumele trebuie să aibă cel puțin 2 caractere.</span>
+          <span *ngIf="clientForm.get('first_name')?.errors?.['maxlength']">Prenumele nu poate depăși 50 de caractere.</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="mb-3">
+    <div class="form-floating">
+      <input
+        type="email"
+        class="form-control"
+        id="email"
+        formControlName="email"
+        placeholder="Email"
+        [ngClass]="{'is-invalid': clientForm.get('email')?.invalid && clientForm.get('email')?.touched}"
+      >
+      <label for="email">Email*</label>
+      <div class="invalid-feedback" *ngIf="clientForm.get('email')?.invalid && clientForm.get('email')?.touched">
+        <span *ngIf="clientForm.get('email')?.errors?.['required']">Email-ul este obligatoriu.</span>
+        <span *ngIf="clientForm.get('email')?.errors?.['email']">Format de email invalid.</span>
+      </div>
+    </div>
+  </div>
+
+  <div formArrayName="phone">
+    <div class="mb-3">
+      <label class="form-label">Telefon*</label>
+      <div class="row mb-2" *ngFor="let tel of phoneArray.controls; let i = index">
+        <div class="col">
+          <div class="input-group">
+            <input
+              type="text"
+              class="form-control"
+              [formControlName]="i"
+              placeholder="Număr de telefon"
+              [ngClass]="{'is-invalid': phoneArray.at(i).invalid && phoneArray.at(i).touched}"
+            >
+            <button
+              type="button"
+              class="btn btn-outline-danger"
+              (click)="removePhone(i)"
+              [disabled]="phoneArray.length <= 1"
+            >
+              <i class="bi bi-trash"></i>
+            </button>
+            <div class="invalid-feedback" *ngIf="phoneArray.at(i)?.invalid && phoneArray.at(i)?.touched">
+              <span *ngIf="phoneArray.at(i)?.errors?.['required']">Numărul de telefon este obligatoriu.</span>
+              <span *ngIf="phoneArray.at(i)?.errors?.['pattern']">Formatul trebuie să fie de 10 cifre (ex: 0712345678).</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="d-grid gap-2 d-md-flex justify-content-md-start">
+        <!-- <button type="button" class="btn btn-outline-primary" (click)="addTelefon()">
+          <i class="bi bi-plus-circle me-1"></i> Adaugă telefon
+        </button> -->
+      </div>
+    </div>
+  </div>
+
+  <div class="form-check form-switch">
+    <input class="form-check-input" type="checkbox" id="clientActiv"
+           formControlName="activ">
+    <label class="form-check-label" for="clientActiv">Client activ</label>
+  </div>
+
+  <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+    <button type="submit" class="btn btn-primary" [disabled]="loading">
+      <span *ngIf="loading" class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
+      Salvează
+    </button>
+  </div>
+</form>

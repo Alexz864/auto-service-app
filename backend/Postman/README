@@ -1,0 +1,10 @@
+# Postman Collection for Auto Service API
+
+This directory contains the Postman collection for testing the project's APIs.
+
+## Import:
+
+1. Open Postman
+2. Click on the "Import" button
+3. Navigate to this file and select it
+4. Click on "Import"

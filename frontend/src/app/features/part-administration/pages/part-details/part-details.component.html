@@ -1,0 +1,145 @@
+<div class="container-fluid">
+  <div class="row mb-4">
+    <div class="col">
+      <h2>Detalii Piesă</h2>
+      <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a [routerLink]="['/parts']">Piese</a></li>
+          <li class="breadcrumb-item active">Detalii</li>
+        </ol>
+      </nav>
+    </div>
+    <div class="col-auto">
+      <div class="btn-group">
+        <a [routerLink]="['/parts', partId, 'edit']" class="btn btn-primary">
+          <i class="bi bi-pencil me-1"></i> Editează
+        </a>
+        <button *ngIf="part?.activa" (click)="onDeactivatePart()" class="btn btn-warning">
+          <i class="bi bi-x-circle me-1"></i> Dezactivează
+        </button>
+        <button *ngIf="part && !part.activa" (click)="onActivatePart()" class="btn btn-success">
+          <i class="bi bi-check-circle me-1"></i> Activează
+        </button>
+        <button (click)="onDeletePart()" class="btn btn-danger">
+          <i class="bi bi-trash me-1"></i> Șterge
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="loading" class="d-flex justify-content-center my-5">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Se încarcă...</span>
+    </div>
+  </div>
+
+  <div *ngIf="!loading && part">
+    <div class="row">
+      <div class="col-md-8">
+        <div class="card mb-4">
+          <div class="card-header">
+            <h5 class="card-title mb-0">Informații Piesă</h5>
+          </div>
+          <div class="card-body">
+            <div class="part-status mb-3">
+              <span class="badge" [ngClass]="part.activa ? 'bg-success' : 'bg-danger'">
+                {{ part.activa ? 'Activă' : 'Inactivă' }}
+              </span>
+            </div>
+
+            <div class="piesa-info">
+              <div class="row mb-3">
+                <div class="col-md-6">
+                  <div class="info-group">
+                    <label>Nume:</label>
+                    <p>{{ part.name }}</p>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="info-group">
+                    <label>Cod:</label>
+                    <p>{{ part.code }}</p>
+                  </div>
+                </div>
+              </div>
+
+              <div class="info-group mb-3">
+                <label>Descriere:</label>
+                <p>{{ part.description }}</p>
+              </div>
+
+              <div class="row mb-3">
+                <div class="col-md-6">
+                  <div class="info-group">
+                    <label>Preț:</label>
+                    <p>{{ part.price | currency:'RON ' }}</p>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="info-group">
+                    <label>Stoc:</label>
+                    <p>
+                      <span
+                        [ngClass]="{
+                          'text-success': part.stock > 10,
+                          'text-warning': part.stock > 0 && part.stock <= 10,
+                          'text-danger': part.stock <= 0
+                        }"
+                      >
+                        {{ part.stock }}
+                      </span>
+                      <button class="btn btn-sm btn-link" (click)="onUpdateStock()">
+                        <i class="bi bi-pencil-square"></i> Actualizează stoc
+                      </button>
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-4">
+        <div class="card">
+          <div class="card-header">
+            <h5 class="card-title mb-0">Statistici</h5>
+          </div>
+          <div class="card-body">
+            <div class="d-flex flex-column align-items-center">
+              <div class="stock-status mb-4">
+                <div class="progress" style="width: 200px; height: 20px;">
+                  <div class="progress-bar" role="progressbar"
+                       [ngClass]="{
+                         'bg-success': part.stock > 10,
+                         'bg-warning': part.stock > 0 && part.stock <= 10,
+                         'bg-danger': part.stock <= 0
+                       }"
+                       [style.width]="(part.stock > 0 ? (part.stock > 100 ? 100 : part.stock) : 0) + '%'"
+                       [attr.aria-valuenow]="part.stock"
+                       aria-valuemin="0"
+                       aria-valuemax="100">
+                    {{ part.stock }}
+                  </div>
+                </div>
+                <div class="text-center mt-2">
+                  <small class="text-muted">Stoc curent</small>
+                </div>
+              </div>
+
+              <div class="price-tag mb-3">
+                <h3>{{ part.price | currency:'RON ' }}</h3>
+                <small class="text-muted">Preț unitar</small>
+              </div>
+
+              <div class="value-tag">
+                <h4>{{ part.price * part.stock | currency:'RON ' }}</h4>
+                <small class="text-muted">Valoare totală în stoc</small>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

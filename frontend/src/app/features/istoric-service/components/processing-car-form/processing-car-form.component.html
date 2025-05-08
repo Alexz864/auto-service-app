@@ -1,0 +1,134 @@
+<form [formGroup]="processingForm" (ngSubmit)="onSubmit()">
+  <div class="mb-3">
+    <div class="form-floating">
+      <textarea
+        class="form-control"
+        id="operationsDone"
+        formControlName="operationsDone"
+        placeholder="Operațiuni efectuate"
+        style="height: 100px"
+        [ngClass]="{'is-invalid': processingForm.get('operationsDone')?.invalid && processingForm.get('operationsDone')?.touched}"
+      ></textarea>
+      <label for="operationsDone">Operațiuni efectuate*</label>
+      <div class="invalid-feedback" *ngIf="processingForm.get('operationsDone')?.invalid && processingForm.get('operationsDone')?.touched">
+        <span *ngIf="processingForm.get('operationsDone')?.errors?.['required']">Acest câmp este obligatoriu.</span>
+        <span *ngIf="processingForm.get('operationsDone')?.errors?.['minlength']">Descrierea trebuie să aibă minim 5 caractere.</span>
+        <span *ngIf="processingForm.get('operationsDone')?.errors?.['maxlength']">Descrierea nu poate depăși 500 de caractere.</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="mb-3">
+    <label class="form-label">Piese utilizate</label>
+
+    <div formArrayName="usedParts">
+      <div class="mb-2" *ngFor="let usedPart of usedPartsArray.controls; let i = index" [formGroupName]="i">
+        <div class="row">
+          <div class="col-md-8">
+            <select
+              class="form-select"
+              formControlName="partId"
+              [ngClass]="{'is-invalid': usedPart.get('partId')?.invalid && usedPart.get('partId')?.touched}"
+            >
+              <option [ngValue]="null">-- Selectați piesa --</option>
+              <option *ngFor="let part of parts" [value]="part.id">{{ part.name }} - {{ part.code }} ({{ part.price | currency:'RON ' }})</option>
+            </select>
+            <div class="invalid-feedback" *ngIf="usedPart.get('partId')?.invalid && usedPart.get('partId')?.touched">
+              <span *ngIf="usedPart.get('partId')?.errors?.['required']">Selectați o piesă.</span>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <input
+              type="number"
+              class="form-control"
+              formControlName="quantity"
+              placeholder="Cantitate"
+              min="1"
+              [ngClass]="{'is-invalid': usedPart.get('quantity')?.invalid && usedPart.get('quantity')?.touched}"
+            >
+            <div class="invalid-feedback" *ngIf="usedPart.get('quantity')?.invalid && usedPart.get('quantity')?.touched">
+              <span *ngIf="usedPart.get('quantity')?.errors?.['required']">Cantitatea este obligatorie.</span>
+              <span *ngIf="usedPart.get('quantity')?.errors?.['min']">Cantitatea trebuie să fie cel puțin 1.</span>
+            </div>
+          </div>
+          <div class="col-md-1">
+            <button type="button" class="btn btn-danger" (click)="removePart(i)">
+              <i class="bi bi-trash"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <button type="button" class="btn btn-outline-primary" (click)="addPart()">
+        <i class="bi bi-plus-circle me-1"></i> Adaugă piesă
+      </button>
+    </div>
+  </div>
+
+  <div class="mb-3">
+    <div class="form-floating">
+      <textarea
+        class="form-control"
+        id="foundProblems"
+        formControlName="foundProblems"
+        placeholder="Probleme depistate"
+        style="height: 100px"
+        [ngClass]="{'is-invalid': processingForm.get('foundProblems')?.invalid && processingForm.get('foundProblems')?.touched}"
+      ></textarea>
+      <label for="foundProblems">Probleme depistate*</label>
+      <div class="invalid-feedback" *ngIf="processingForm.get('foundProblems')?.invalid && processingForm.get('foundProblems')?.touched">
+        <span *ngIf="processingForm.get('foundProblems')?.errors?.['required']">Acest câmp este obligatoriu.</span>
+        <span *ngIf="processingForm.get('foundProblems')?.errors?.['minlength']">Descrierea trebuie să aibă minim 5 caractere.</span>
+        <span *ngIf="processingForm.get('foundProblems')?.errors?.['maxlength']">Descrierea nu poate depăși 500 de caractere.</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="mb-3">
+    <div class="form-floating">
+      <textarea
+        class="form-control"
+        id="solvedProblems"
+        formControlName="solvedProblems"
+        placeholder="Probleme rezolvate"
+        style="height: 100px"
+        [ngClass]="{'is-invalid': processingForm.get('solvedProblems')?.invalid && processingForm.get('solvedProblems')?.touched}"
+      ></textarea>
+      <label for="solvedProblems">Probleme rezolvate*</label>
+      <div class="invalid-feedback" *ngIf="processingForm.get('solvedProblems')?.invalid && processingForm.get('solvedProblems')?.touched">
+        <span *ngIf="processingForm.get('solvedProblems')?.errors?.['required']">Acest câmp este obligatoriu.</span>
+        <span *ngIf="processingForm.get('solvedProblems')?.errors?.['minlength']">Descrierea trebuie să aibă minim 5 caractere.</span>
+        <span *ngIf="processingForm.get('solvedProblems')?.errors?.['maxlength']">Descrierea nu poate depăși 500 de caractere.</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="mb-3">
+    <div class="form-floating">
+      <input
+        type="number"
+        class="form-control"
+        id="serviceTime"
+        formControlName="serviceTime"
+        placeholder="Durata reparației (minute)"
+        [ngClass]="{'is-invalid': processingForm.get('serviceTime')?.invalid && processingForm.get('serviceTime')?.touched}"
+        min="0"
+        max="1440"
+        step="10"
+      >
+      <label for="serviceTime">Durata reparației (minute)*</label>
+      <div class="invalid-feedback" *ngIf="processingForm.get('serviceTime')?.invalid && processingForm.get('serviceTime')?.touched">
+        <span *ngIf="processingForm.get('serviceTime')?.errors?.['required']">Durata este obligatorie.</span>
+        <span *ngIf="processingForm.get('serviceTime')?.errors?.['min']">Durata trebuie să fie cel puțin 0.</span>
+        <span *ngIf="processingForm.get('serviceTime')?.errors?.['max']">Durata nu poate depăși 1440 minute (24 ore).</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+    <button type="submit" class="btn btn-primary" [disabled]="loading">
+      <span *ngIf="loading" class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
+      Salvează
+    </button>
+  </div>
+</form>

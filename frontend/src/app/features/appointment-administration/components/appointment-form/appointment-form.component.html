@@ -1,0 +1,130 @@
+<form [formGroup]="appointmentForm" (ngSubmit)="onSubmit()">
+  <div class="row mb-3">
+    <div class="col-md-6">
+      <div class="form-floating">
+        <select
+          class="form-select"
+          id="clientId"
+          formControlName="clientId"
+          [ngClass]="{'is-invalid': appointmentForm.get('clientId')?.invalid && appointmentForm.get('clientId')?.touched}"
+          (change)="onClientChange()"
+        >
+          <option [ngValue]="null" disabled>Selectați clientul</option>
+          <option *ngFor="let client of clients" [value]="client.id">
+            {{ client.last_name }} {{ client.first_name }}
+          </option>
+        </select>
+        <label for="clientId">Client*</label>
+        <div class="invalid-feedback" *ngIf="appointmentForm.get('clientId')?.invalid && appointmentForm.get('clientId')?.touched">
+          <span *ngIf="appointmentForm.get('clientId')?.errors?.['required']">Selectați clientul.</span>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-6">
+      <div class="form-floating">
+        <select
+          class="form-select"
+          id="carId"
+          formControlName="carId"
+          [ngClass]="{'is-invalid': appointmentForm.get('carId')?.invalid && appointmentForm.get('carId')?.touched}"
+        >
+          <option [ngValue]="null" disabled>Selectați mașina</option>
+          <option *ngFor="let car of clientCars" [value]="car.id">
+            {{ car.brand }} {{ car.model }} ({{ car.registrationNumber }})
+          </option>
+        </select>
+        <label for="carId">Mașină*</label>
+        <div class="invalid-feedback" *ngIf="appointmentForm.get('carId')?.invalid && appointmentForm.get('carId')?.touched">
+          <span *ngIf="appointmentForm.get('carId')?.errors?.['required']">Selectați mașina.</span>
+        </div>
+        <small *ngIf="appointmentForm.get('clientId')?.valid && clientCars.length === 0" class="text-danger">
+          Acest client nu are nicio mașină înregistrată. <a [routerLink]="['/cars/add']" [queryParams]="{clientId: appointmentForm.get('clientId')?.value}">Adăugați o mașină</a>
+        </small>
+      </div>
+    </div>
+  </div>
+
+  <div class="row mb-3">
+    <div class="col-md-4">
+      <div class="form-floating">
+        <input
+          type="date"
+          class="form-control"
+          id="dateInput"
+          formControlName="dateInput"
+          placeholder="Data programării"
+          [ngClass]="{'is-invalid': appointmentForm.get('dateInput')?.invalid && appointmentForm.get('dateInput')?.touched}"
+          [min]="loading ? '' : getTodayISOString()"
+        >
+        <label for="dateInput">Data programării*</label>
+        <div class="invalid-feedback" *ngIf="appointmentForm.get('dateInput')?.invalid && appointmentForm.get('dateInput')?.touched">
+          <span *ngIf="appointmentForm.get('dateInput')?.errors?.['required']">Data programării este obligatorie.</span>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-8">
+      <div class="form-floating">
+        <select
+          class="form-select"
+          id="interval"
+          formControlName="interval"
+          [ngClass]="{'is-invalid': appointmentForm.get('interval')?.invalid && appointmentForm.get('interval')?.touched}"
+        >
+          <option [ngValue]="''" disabled>Selectați intervalul orar</option>
+          <option *ngFor="let interval of intervaleTimp; let i = index" [value]="i">
+            {{ interval.start }} - {{ interval.final }}
+          </option>
+        </select>
+        <label for="interval">Interval orar*</label>
+        <div class="invalid-feedback" *ngIf="appointmentForm.get('interval')?.invalid && appointmentForm.get('interval')?.touched">
+          <span *ngIf="appointmentForm.get('interval')?.errors?.['required']">Selectați intervalul orar.</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="mb-3">
+    <div class="form-floating">
+      <textarea
+        class="form-control"
+        id="problemDescription"
+        formControlName="problemDescription"
+        placeholder="Descrierea problemei"
+        style="height: 120px"
+        [ngClass]="{'is-invalid': appointmentForm.get('problemDescription')?.invalid && appointmentForm.get('problemDescription')?.touched}"
+      ></textarea>
+      <label for="problemDescription">Descrierea problemei*</label>
+      <div class="invalid-feedback" *ngIf="appointmentForm.get('problemDescription')?.invalid && appointmentForm.get('problemDescription')?.touched">
+        <span *ngIf="appointmentForm.get('problemDescription')?.errors?.['required']">Descrierea problemei este obligatorie.</span>
+        <span *ngIf="appointmentForm.get('problemDescription')?.errors?.['minlength']">Descrierea trebuie să aibă minim 10 caractere.</span>
+        <span *ngIf="appointmentForm.get('problemDescription')?.errors?.['maxlength']">Descrierea nu poate depăși 500 de caractere.</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="mb-3">
+    <div class="form-floating">
+      <select
+        class="form-select"
+        id="contactMethod"
+        formControlName="contactMethod"
+        [ngClass]="{'is-invalid': appointmentForm.get('contactMethod')?.invalid && appointmentForm.get('contactMethod')?.touched}"
+      >
+        <option *ngFor="let method of contactMethod" [value]="method">
+          {{ method === 'email' ? 'Email' : (method === 'telefon' ? 'Telefon' : 'În persoană') }}
+        </option>
+      </select>
+      <label for="contactMethod">Metoda programare*</label>
+      <div class="invalid-feedback" *ngIf="appointmentForm.get('contactMethod')?.invalid && appointmentForm.get('contactMethod')?.touched">
+        <span *ngIf="appointmentForm.get('contactMethod')?.errors?.['required']">Selectați metoda de programare.</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+    <button type="submit" class="btn btn-primary" [disabled]="loading || loadingData">
+      <span *ngIf="loading || loadingData" class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
+      Salvează
+    </button>
+  </div>
+</form>

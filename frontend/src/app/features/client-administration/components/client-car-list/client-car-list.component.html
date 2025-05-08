@@ -1,0 +1,52 @@
+<div *ngIf="loading" class="d-flex justify-content-center my-3">
+  <div class="spinner-border text-primary" role="status">
+    <span class="visually-hidden">Se încarcă...</span>
+  </div>
+</div>
+
+<div *ngIf="!loading && cars.length === 0" class="alert alert-info mb-0">
+  Acest client nu are nicio mașină înregistrată.
+</div>
+
+<div *ngIf="!loading && cars.length > 0" class="table-responsive">
+  <table class="table table-hover">
+    <thead>
+      <tr>
+        <th>Număr Înmatriculare</th>
+        <th>Marca / Model</th>
+        <th>An Fabricație</th>
+        <th>Motorizare</th>
+        <th>Status</th>
+        <th>Acțiuni</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let car of cars">
+        <td>{{ car.registrationNumber }}</td>
+        <td>{{ car.brand }} {{ car.model }}</td>
+        <td>{{ car.yearOfManufacture }}</td>
+        <td>
+          {{ car.engineType }} / {{ car.engineCapacity }} cm³ / {{ car.horsePower }} CP
+        </td>
+        <td>
+          <span class="badge" [ngClass]="car.activa ? 'bg-success' : 'bg-danger'">
+            {{ car.activa ? 'Activ' : 'Inactiv' }}
+          </span>
+        </td>
+        <td>
+          <div class="btn-group">
+            <a [routerLink]="['/cars', car.id]" class="btn btn-sm btn-info" title="Detalii">
+              <i class="bi bi-info-circle"></i>
+            </a>
+            <a [routerLink]="['/cars', car.id, 'edit']" class="btn btn-sm btn-warning" title="Editează">
+              <i class="bi bi-pencil"></i>
+            </a>
+            <a [routerLink]="['/appointments/add']" [queryParams]="{clientId: car.clientId, carId: car.id}" class="btn btn-sm btn-success" title="Programare">
+              <i class="bi bi-calendar-plus"></i>
+            </a>
+          </div>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>

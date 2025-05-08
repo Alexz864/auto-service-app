@@ -1,0 +1,105 @@
+<div class="container-fluid">
+  <div class="row mb-4">
+    <div class="col">
+      <h2>Calendar Programări</h2>
+      <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a [routerLink]="['/appointments']">Programări</a></li>
+          <li class="breadcrumb-item active">Calendar</li>
+        </ol>
+      </nav>
+    </div>
+    <div class="col-auto">
+      <div class="btn-group">
+        <a [routerLink]="['/appointments/add']" class="btn btn-primary">
+          <i class="bi bi-plus-circle me-1"></i> Adaugă Programare
+        </a>
+        <a [routerLink]="['/appointments']" class="btn btn-secondary">
+          <i class="bi bi-list me-1"></i> Listă Programări
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-body">
+      <div class="calendar-header mb-4">
+        <div class="row align-items-center">
+          <div class="col-md-4">
+            <div class="btn-group">
+              <button class="btn btn-outline-secondary" (click)="previousMonth()">
+                <i class="bi bi-chevron-left"></i>
+              </button>
+              <button class="btn btn-outline-secondary" (click)="goToToday()">Astăzi</button>
+              <button class="btn btn-outline-secondary" (click)="nextMonth()">
+                <i class="bi bi-chevron-right"></i>
+              </button>
+            </div>
+          </div>
+          <div class="col-md-4 text-center">
+            <h4 class="mb-0">{{ months[currentMonth.getMonth()] }} {{ currentMonth.getFullYear() }}</h4>
+          </div>
+          <div class="col-md-4 text-end">
+            <span *ngIf="loading" class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
+            <span *ngIf="loading">Se încarcă programările...</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="calendar-grid">
+        <div class="calendar-header-days">
+          <div class="calendar-weekday" *ngFor="let day of shortWeekDays">{{ day }}</div>
+        </div>
+        <div class="calendar-days">
+          <div *ngFor="let day of calendarDays" class="calendar-day"
+                [class.other-month]="!day.isCurrentMonth"
+                [class.today]="day.isToday">
+            <div class="day-header">
+              <span class="day-number">{{ day.date.getDate() }}</span>
+            </div>
+            <div class="day-content">
+              <div *ngIf="day.appointments.length === 0 && day.isCurrentMonth" class="no-events">
+                <small class="text-muted" *ngIf="isCurrentOrFutureDate(day.date)">
+                  Nicio programare
+                </small>
+              </div>
+              <div *ngFor="let appointment of day.appointments" class="event"
+                  [class.event-success]="appointment.status === 'finalizat'"
+                  [class.event-warning]="appointment.status === 'in-progres'"
+                  [class.event-info]="appointment.status === 'programat'"
+                  [class.event-danger]="appointment.status === 'anulat'"
+                  (click)="goToAppointment(appointment.id!)">
+                  <div class="event-time">
+                    {{ appointment.date | date:'HH:mm' }} -
+                    {{ calculateFinishDate(appointment.date, appointment.time) | date:'HH:mm' }}
+                  </div>
+                <div class="event-title">{{ appointment.problemDescription | slice:0:20 }}{{ appointment.problemDescription.length > 20 ? '...' : '' }}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="calendar-legend mt-4">
+        <div class="d-flex justify-content-center flex-wrap">
+          <div class="legend-item me-3">
+            <span class="legend-color bg-info"></span>
+            <span class="legend-text">Programat</span>
+          </div>
+          <div class="legend-item me-3">
+            <span class="legend-color bg-warning"></span>
+            <span class="legend-text">În progres</span>
+          </div>
+          <div class="legend-item me-3">
+            <span class="legend-color bg-success"></span>
+            <span class="legend-text">Finalizat</span>
+          </div>
+          <div class="legend-item">
+            <span class="legend-color bg-danger"></span>
+            <span class="legend-text">Anulat</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

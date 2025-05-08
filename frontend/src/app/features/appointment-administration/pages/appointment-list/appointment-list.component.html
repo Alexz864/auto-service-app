@@ -1,0 +1,151 @@
+<div class="container-fluid">
+  <div class="row mb-4">
+    <div class="col">
+      <h2>
+        Programări
+        <span *ngIf="clientName" class="text-muted fs-5 ms-2">pentru clientul {{ clientName }}</span>
+        <span *ngIf="carDetails" class="text-muted fs-5 ms-2">pentru mașina {{ carDetails }}</span>
+      </h2>
+    </div>
+    <div class="col-auto">
+      <div class="btn-group">
+        <a [routerLink]="['/appointments/add']" class="btn btn-primary">
+          <i class="bi bi-plus-circle me-1"></i> Adaugă Programare
+        </a>
+        <a [routerLink]="['/appointments/calendar']" class="btn btn-info">
+          <i class="bi bi-calendar me-1"></i> Vezi Calendar
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-body">
+      <div class="row mb-3">
+        <div class="col-md-4">
+          <div class="input-group">
+            <input
+              type="text"
+              class="form-control"
+              placeholder="Caută după descriere problemă..."
+              [(ngModel)]="searchTerm"
+              (keyup.enter)="onSearch()"
+            >
+            <button class="btn btn-outline-secondary" type="button" (click)="onSearch()">
+              <i class="bi bi-search"></i>
+            </button>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <select class="form-select" [(ngModel)]="selectedStatus" (change)="applyFilters()">
+            <option value="">Toate statusurile</option>
+            <option value="programat">Programat</option>
+            <option value="in lucru">În progres</option>
+            <option value="finalizat">Finalizat</option>
+            <option value="anulat">Anulat</option>
+          </select>
+        </div>
+        <div class="col-md-3">
+          <select class="form-select" [(ngModel)]="selectedData" (change)="applyFilters()">
+            <option value="">Toate datele</option>
+            <option value="today">Astăzi</option>
+            <option value="future">Viitoare</option>
+            <option value="past">Trecute</option>
+          </select>
+        </div>
+        <div class="col-md-2 text-end">
+          <button class="btn btn-outline-secondary" (click)="clearFilters()">
+            <i class="bi bi-x-circle me-1"></i> Resetează
+          </button>
+        </div>
+      </div>
+
+      <div *ngIf="loading" class="d-flex justify-content-center my-5">
+        <div class="spinner-border text-primary" role="status">
+          <span class="visually-hidden">Se încarcă...</span>
+        </div>
+      </div>
+
+      <div *ngIf="!loading && filteredAppointments.length === 0" class="alert alert-info">
+        Nu a fost găsită nicio programare care să corespundă criteriilor de căutare.
+      </div>
+
+      <div *ngIf="!loading && filteredAppointments.length > 0" class="table-responsive">
+        <table class="table table-hover">
+          <thead>
+            <tr>
+              <th>Data & Ora</th>
+              <th>Client</th>
+              <th>Mașină</th>
+              <th>Problema</th>
+              <th>Modalitate</th>
+              <th>Status</th>
+              <th>Acțiuni</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let appointment of filteredAppointments">
+              <td>
+                <div class="fw-bold">{{ appointment.date | date:'dd.MM.yyyy' }}</div>
+                <small>
+                  {{ appointment.date | date:'HH:mm' }} -
+                  {{ calculateFinishDate(appointment.date, appointment.time) | date:'HH:mm' }}
+                </small>
+              </td>
+              <td>
+                <a [routerLink]="['/clients', appointment.clientId]">Vezi client</a>
+              </td>
+              <td>
+                <a [routerLink]="['/cars', appointment.carId]">Vezi mașină</a>
+              </td>
+              <td>{{ appointment.problemDescription | slice:0:50 }}{{ appointment.problemDescription.length > 50 ? '...' : '' }}</td>
+              <td>{{ getMethodLabel(appointment.contactMethod) }}</td>
+              <td>
+                <span class="badge" [ngClass]="{
+                  'bg-success': appointment.status === 'finalizat',
+                  'bg-warning': appointment.status === 'in lucru',
+                  'bg-info': appointment.status === 'programat',
+                  'bg-danger': appointment.status === 'anulat'
+                }">
+                  {{ appointment.status }}
+                </span>
+              </td>
+              <td>
+                <div class="btn-group">
+                  <a [routerLink]="['/appointments', appointment.id]" class="btn btn-sm btn-info" title="Detalii">
+                    <i class="bi bi-info-circle"></i>
+                  </a>
+                  <!-- <a [routerLink]="['/appointments', appointment.id, 'edit']" class="btn btn-sm btn-warning" title="Editează">
+                    <i class="bi bi-pencil"></i>
+                  </a> -->
+                  <button
+                    *ngIf="appointment.status === 'programat'"
+                    (click)="onCancelAppointment(appointment.id!)"
+                    class="btn btn-sm btn-secondary"
+                    title="Anulează">
+                    <i class="bi bi-x-circle"></i>
+                  </button>
+                  <button
+                    *ngIf="appointment.status === 'anulat' || appointment.status === 'finalizat'"
+                    (click)="onDeleteAppointment(appointment.id!)"
+                    class="btn btn-sm btn-danger"
+                    title="Șterge">
+                    <i class="bi bi-trash"></i>
+                  </button>
+                  <a
+                    *ngIf="appointment.status === 'programat'"
+                    [routerLink]="['/istoric/add']"
+                    [queryParams]="{appointmentId: appointment.id}"
+                    class="btn btn-sm btn-success"
+                    title="Primire mașină">
+                    <i class="bi bi-tools"></i>
+                  </a>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>

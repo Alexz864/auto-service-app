@@ -1,0 +1,162 @@
+<div class="container-fluid">
+  <div class="row mb-4">
+    <div class="col">
+      <h2>Detalii Client</h2>
+      <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a [routerLink]="['/clients']">Clienți</a></li>
+          <li class="breadcrumb-item active">Detalii</li>
+        </ol>
+      </nav>
+    </div>
+    <div class="col-auto">
+      <div class="btn-group">
+        <a [routerLink]="['/clients', clientId, 'edit']" class="btn btn-primary">
+          <i class="bi bi-pencil me-1"></i> Editează
+        </a>
+        <button *ngIf="client?.activ" (click)="onDeactivateClient()" class="btn btn-warning">
+          <i class="bi bi-x-circle me-1"></i> Dezactivează
+        </button>
+        <button *ngIf="client && !client.activ" (click)="onActivateClient()" class="btn btn-success">
+          <i class="bi bi-check-circle me-1"></i> Activează
+        </button>
+        <button (click)="onDeleteClient()" class="btn btn-danger">
+          <i class="bi bi-trash me-1"></i> Șterge
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="loading" class="d-flex justify-content-center my-5">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Se încarcă...</span>
+    </div>
+  </div>
+
+  <div *ngIf="!loading && client">
+    <div class="row">
+      <div class="col-md-4">
+        <div class="card mb-4">
+          <div class="card-header">
+            <h5 class="card-title mb-0">Informații Client</h5>
+          </div>
+          <div class="card-body">
+            <div class="client-status mb-3">
+              <span class="badge" [ngClass]="client.activ ? 'bg-success' : 'bg-danger'">
+                {{ client.activ ? 'Activ' : 'Inactiv' }}
+              </span>
+            </div>
+
+            <div class="client-info">
+              <div class="info-group">
+                <label>Nume Complet:</label>
+                <p>{{ client.last_name }} {{ client.first_name }}</p>
+              </div>
+
+              <div class="info-group">
+                <label>Email:</label>
+                <p>
+                  <a [href]="'mailto:' + client.email">{{ client.email }}</a>
+                </p>
+              </div>
+
+              <div class="info-group">
+                <label>Telefon:</label>
+                <p>
+                  <a [href]="'tel:' + client.phone">{{ client.phone }}</a>
+                </p>
+              </div>
+
+              <div class="info-group">
+                <label>Mașini înregistrate:</label>
+                <p>{{ cars.length }}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card mb-4">
+          <div class="card-header">
+            <h5 class="card-title mb-0">Acțiuni Rapide</h5>
+          </div>
+          <div class="card-body">
+            <div class="d-grid gap-2">
+              <a [routerLink]="['/cars/add']" [queryParams]="{clientId: clientId}" class="btn btn-primary">
+                <i class="bi bi-car-front me-1"></i> Adaugă Mașină
+              </a>
+              <a [routerLink]="['/appointments/add']" [queryParams]="{clientId: clientId}" class="btn btn-success">
+                <i class="bi bi-calendar-plus me-1"></i> Creează Programare
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-8">
+        <div class="card mb-4">
+          <div class="card-header d-flex justify-content-between align-items-center">
+            <h5 class="card-title mb-0">Mașinile Clientului</h5>
+            <a [routerLink]="['/cars/add']" [queryParams]="{clientId: clientId}" class="btn btn-sm btn-primary">
+              <i class="bi bi-plus-circle me-1"></i> Adaugă Mașină
+            </a>
+          </div>
+          <div class="card-body">
+            <app-client-car-list
+              [cars]="cars"
+              [loading]="loading"
+            ></app-client-car-list>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header d-flex justify-content-between align-items-center">
+            <h5 class="card-title mb-0">Programări Recente</h5>
+            <a [routerLink]="['/appointments']" [queryParams]="{clientId: clientId}" class="btn btn-sm btn-primary">
+              <i class="bi bi-calendar me-1"></i> Toate Programările
+            </a>
+          </div>
+          <div class="card-body">
+            <div *ngIf="recentAppointments.length === 0" class="alert alert-info mb-0">
+              Nu există programări recente pentru acest client.
+            </div>
+            <div *ngIf="recentAppointments.length > 0" class="table-responsive">
+              <table class="table table-hover">
+                <thead>
+                  <tr>
+                    <th>Data</th>
+                    <th>Ora</th>
+                    <th>Problema</th>
+                    <th>Status</th>
+                    <th>Acțiuni</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let appointment of recentAppointments">
+                    <td>{{ appointment.date | date:'dd.MM.yyyy' }}</td>
+                    <td>{{ appointment.date | date:'HH:mm' }} - {{ calculateFinishDate(appointment.date, appointment.time) | date:'HH:mm' }}</td>
+                    <td>{{ appointment.problemDescription | slice:0:50 }}{{ appointment.problemDescription.length > 50 ? '...' : '' }}</td>
+                    <td>
+                      <span class="badge" [ngClass]="{
+                        'bg-success': appointment.status === 'finalizat',
+                        'bg-warning': appointment.status === 'in lucru',
+                        'bg-info': appointment.status === 'programat',
+                        'bg-danger': appointment.status === 'anulat'
+                      }">
+                        {{ appointment.status }}
+                      </span>
+                    </td>
+                    <td>
+                      <a [routerLink]="['/appointments', appointment.id]" class="btn btn-sm btn-info">
+                        <i class="bi bi-eye"></i>
+                      </a>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

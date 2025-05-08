@@ -1,0 +1,112 @@
+<form [formGroup]="partForm" (ngSubmit)="onSubmit()">
+  <div class="row mb-3">
+    <div class="col-md-6">
+      <div class="form-floating">
+        <input
+          type="text"
+          class="form-control"
+          id="name"
+          formControlName="name"
+          placeholder="Nume"
+          [ngClass]="{'is-invalid': partForm.get('name')?.invalid && partForm.get('name')?.touched}"
+        >
+        <label for="name">Nume*</label>
+        <div class="invalid-feedback" *ngIf="partForm.get('name')?.invalid && partForm.get('name')?.touched">
+          <span *ngIf="partForm.get('name')?.errors?.['required']">Numele este obligatoriu.</span>
+          <span *ngIf="partForm.get('name')?.errors?.['minlength']">Numele trebuie să aibă cel puțin 2 caractere.</span>
+          <span *ngIf="partForm.get('name')?.errors?.['maxlength']">Numele nu poate depăși 100 de caractere.</span>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-6">
+      <div class="form-floating">
+        <input
+          type="text"
+          class="form-control"
+          id="code"
+          formControlName="code"
+          placeholder="Cod"
+          [ngClass]="{'is-invalid': partForm.get('code')?.invalid && partForm.get('code')?.touched}"
+        >
+        <label for="cod">Cod*</label>
+        <div class="invalid-feedback" *ngIf="partForm.get('code')?.invalid && partForm.get('code')?.touched">
+          <span *ngIf="partForm.get('code')?.errors?.['required']">Codul este obligatoriu.</span>
+          <span *ngIf="partForm.get('code')?.errors?.['minlength']">Codul trebuie să aibă cel puțin 2 caractere.</span>
+          <span *ngIf="partForm.get('code')?.errors?.['maxlength']">Codul nu poate depăși 50 de caractere.</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="mb-3">
+    <div class="form-floating">
+      <input
+        type="text"
+        class="form-control"
+        id="description"
+        formControlName="description"
+        placeholder="Descriere"
+        [ngClass]="{'is-invalid': partForm.get('description')?.invalid && partForm.get('description')?.touched}"
+      >
+      <label for="description">Descriere*</label>
+      <div class="invalid-feedback" *ngIf="partForm.get('description')?.invalid && partForm.get('description')?.touched">
+        <span *ngIf="partForm.get('description')?.errors?.['required']">Descrierea este obligatoriu.</span>
+        <span *ngIf="partForm.get('description')?.errors?.['minlength']">Descrierea trebuie să aibă cel puțin 2 caractere.</span>
+        <span *ngIf="partForm.get('description')?.errors?.['maxlength']">Descrierea nu poate depăși 100 de caractere.</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="row mb-3">
+    <div class="col-md-6">
+      <div class="form-floating">
+        <input
+          type="number"
+          class="form-control"
+          id="price"
+          formControlName="price"
+          placeholder="Preț"
+          [ngClass]="{'is-invalid': partForm.get('price')?.invalid && partForm.get('price')?.touched}"
+          step="0.01"
+          min="0"
+        >
+        <label for="price">Preț (RON)*</label>
+        <div class="invalid-feedback" *ngIf="partForm.get('price')?.invalid && partForm.get('price')?.touched">
+          <span *ngIf="partForm.get('price')?.errors?.['required']">Prețul este obligatoriu.</span>
+          <span *ngIf="partForm.get('price')?.errors?.['min']">Prețul trebuie să fie mai mare sau egal cu 0.</span>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-6">
+      <div class="form-floating">
+        <input
+          type="number"
+          class="form-control"
+          id="stock"
+          formControlName="stock"
+          placeholder="Stoc"
+          [ngClass]="{'is-invalid': partForm.get('stock')?.invalid && partForm.get('stock')?.touched}"
+          step="1"
+          min="0"
+        >
+        <label for="stock">Stoc*</label>
+        <div class="invalid-feedback" *ngIf="partForm.get('stock')?.invalid && partForm.get('stock')?.touched">
+          <span *ngIf="partForm.get('stock')?.errors?.['required']">Stocul este obligatoriu.</span>
+          <span *ngIf="partForm.get('stock')?.errors?.['min']">Stocul trebuie să fie mai mare sau egal cu 0.</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="form-check form-switch mb-3">
+    <input class="form-check-input" type="checkbox" id="activ" formControlName="activa">
+    <label class="form-check-label" for="activ">Piesă activă</label>
+  </div>
+
+  <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+    <button type="submit" class="btn btn-primary" [disabled]="loading">
+      <span *ngIf="loading" class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
+      Salvează
+    </button>
+  </div>
+</form>
