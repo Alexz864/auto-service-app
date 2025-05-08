@@ -16,6 +16,7 @@ Auto Service Management System is a full-stack web application designed to manag
 ## Technology Stack
 
 ### Backend
+
 - Node.js with Express.js
 - TypeScript for type safety
 - PostgreSQL database
@@ -23,6 +24,7 @@ Auto Service Management System is a full-stack web application designed to manag
 - RESTful API architecture
 
 ### Frontend
+
 - Angular 15
 - TypeScript
 - Bootstrap 5 for responsive design
@@ -34,6 +36,7 @@ Auto Service Management System is a full-stack web application designed to manag
 The project is organized into two main parts:
 
 ### Backend
+
 - `src/config`: Database configuration
 - `src/controllers`: API controllers for handling request/response
 - `src/models`: Database models defined with Sequelize
@@ -41,6 +44,7 @@ The project is organized into two main parts:
 - `src/scripts`: Utility scripts for database operations
 
 ### Frontend
+
 - `src/app/core`: Core services, models, and interceptors
 - `src/app/shared`: Shared components, directives, and modules
 - `src/app/features`: Feature modules for each functional area
@@ -58,19 +62,21 @@ The project is organized into two main parts:
 The easiest way to run the application is using Docker:
 
 1. Clone the repository:
+
 ```bash
-git clone https://github.com/yourusername/auto-service-management.git
-cd auto-service-management
+git clone https://github.com/Alexz864/auto-service-app
 ```
 
 2. Make sure Docker and Docker Compose are installed
 
 3. Run the application stack:
+
 ```bash
 docker-compose up
 ```
 
 This will automatically:
+
 - Start PostgreSQL database on port 5433
 - Build and run the backend server on port 3000
 - Build and serve the frontend on port 4200 (or 80 if using production configuration)
@@ -79,6 +85,7 @@ This will automatically:
 4. Open your browser and navigate to `http://localhost:4200`
 
 To shut down the application:
+
 ```bash
 docker-compose down
 ```
@@ -88,6 +95,7 @@ docker-compose down
 If you prefer to run the application without Docker:
 
 #### Prerequisites
+
 - Node.js (v14+)
 - PostgreSQL (v13+)
 - Angular CLI
@@ -95,16 +103,19 @@ If you prefer to run the application without Docker:
 #### Backend Setup
 
 1. Navigate to the backend directory:
+
 ```bash
 cd backend
 ```
 
 2. Install dependencies:
+
 ```bash
 npm install
 ```
 
 3. Create a `.env` file in the backend root with the following content:
+
 ```
 DB_HOST=localhost
 DB_PORT=5433
@@ -116,11 +127,13 @@ PORT=3000
 ```
 
 4. Initialize the database:
+
 ```bash
 npm run reset-db
 ```
 
 5. Start the backend server:
+
 ```bash
 npm run dev
 ```
@@ -128,16 +141,19 @@ npm run dev
 #### Frontend Setup
 
 1. Navigate to the frontend directory:
+
 ```bash
 cd ../frontend
 ```
 
 2. Install dependencies:
+
 ```bash
 npm install
 ```
 
 3. Start the development server:
+
 ```bash
 ng serve
 ```
@@ -167,11 +183,13 @@ The backend provides a RESTful API with the following main endpoints:
 ## Development
 
 ### Backend
+
 - Build: `npm run build`
 - Start production: `npm start`
 - Reset database: `npm run reset-db`
 
 ### Frontend
+
 - Build: `ng build`
 - Run tests: `ng test`
 - Production build: `ng build --prod`
