@@ -139,7 +139,7 @@ export const updateCar = async (req: Request, res: Response) : Promise<Response>
       yearOfManufacture: yearOfManufacture || car.yearOfManufacture,
       engineType: engineType || car.engineType,
       engineCapacity: engineCapacity || car.engineCapacity,
-      caiPutere: horsePower || car.horsePower,
+      horsePower: horsePower || car.horsePower,
       kW
     });
     
