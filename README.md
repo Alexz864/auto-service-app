@@ -2,7 +2,7 @@
 
 ## Overview
 
-Auto Service Management -- a full-stack web application designed to manage an auto service workshop, including client management, car records, service appointments, inventory management, and complete service history tracking. The application aims to streamline operations for auto repair shops and service centers.
+Auto Service Management - a full-stack web application designed to manage an auto service workshop, including client management, car records, service appointments, inventory management, and complete service history tracking. The application aims to streamline operations for auto repair shops and service centers.
 
 ## Features
 
