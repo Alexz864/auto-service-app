@@ -67,7 +67,7 @@ The easiest way to run the application is using Docker:
 git clone https://github.com/Alexz864/auto-service-app
 ```
 
-2. Make sure Docker and Docker Compose are installed
+2. Make sure Docker is installed
 
 3. Run the application stack:
 
