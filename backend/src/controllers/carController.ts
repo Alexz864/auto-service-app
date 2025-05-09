@@ -15,8 +15,7 @@ export const createCar = async (req: Request, res: Response) : Promise<Response>
     horsePower,
     activa,
   } = req.body;
-  
-  //validations
+
   if (!clientId || !registrationNumber || !chassisSeries || !brand || !model || !yearOfManufacture || !engineType || !engineCapacity || !horsePower) {
     return res.status(400).json({ message: 'Toate câmpurile sunt obligatorii.' });
   }

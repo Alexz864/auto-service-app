@@ -23,12 +23,12 @@ export const createAppointment = async (req: Request, res: Response): Promise<Re
     problemDescription,
     contactMethod,
   } = req.body;
+
+  const appointmentDateTime = new Date(date);
   
   if (!clientId || !carId || !date || !time || !problemDescription || !contactMethod) {
     return res.status(400).json({ message: 'Toate câmpurile sunt obligatorii.' });
   }
-  
-  const appointmentDateTime = new Date(date);
   
   if (isNaN(appointmentDateTime.getTime())) {
     return res.status(400).json({ message: 'Data și ora programării nu sunt valide.' });
@@ -57,24 +57,25 @@ export const createAppointment = async (req: Request, res: Response): Promise<Re
       return res.status(404).json({ message: 'Mașina nu a fost găsită sau nu aparține clientului specificat.' });
     }
 
+    //calculate appointment end time
     const dateTimeDone = new Date(appointmentDateTime);
     dateTimeDone.setMinutes(dateTimeDone.getMinutes() + time);
     
-    //verify if there are already appointments on that date
+    //find potentially overlapping appointments
     const overlappingAppointments = await Appointment.findAll({
       where: {
         status: {
-          [Op.ne]: 'anulat'
+          [Op.ne]: 'anulat' //exclude canceled appointments
         },
         [Op.or]: [
-          //appointments that start during new appointment
+          //case1: appointments that start during the new appointment's time slot
           {
             date: {
               [Op.gte]: appointmentDateTime,
               [Op.lt]: dateTimeDone
             }
           },
-          //appointments that start before and end after the start of the new appointment
+          //case2: appointments that start before and might overlap with the new appointment
           {
             date: {
               [Op.lt]: appointmentDateTime
@@ -84,6 +85,7 @@ export const createAppointment = async (req: Request, res: Response): Promise<Re
       }
     });
 
+    //further filter for actual overlaps by checking end times
     const filteredOverlappingAppointments = overlappingAppointments.filter(prog => {
       const appointmentEndTime = new Date(prog.date);
       appointmentEndTime.setMinutes(appointmentEndTime.getMinutes() + prog.time);
@@ -236,17 +238,18 @@ export const updateAppointment = async (req: Request, res: Response): Promise<Re
       updatedTime = time;
     }
     
+    //calculate updated appointment end time
     const dateTimeFinish = new Date(updatedDate);
     dateTimeFinish.setMinutes(dateTimeFinish.getMinutes() + updatedTime);
     
-    //verify if there are overlapping appointments
+    //check for conflicts with other appointments if date or time changed
     if (date || time) {
       //get all active appointments(non-canceled)
       const activeAppointments = await Appointment.findAll({
         where: {
           id: { [Op.ne]: id }, //exclude current appointment
           status: {
-            [Op.ne]: 'anulat'
+            [Op.ne]: 'anulat' //exclude canceled appointments
           }
         }
       });
