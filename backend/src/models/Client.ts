@@ -20,8 +20,9 @@ Client.init(
       primaryKey: true,
     },
     last_name: {
-      type: DataTypes.STRING(50),
-      allowNull: false,
+    type: DataTypes.STRING(50),
+    allowNull: false,
+    defaultValue: '(Not provided)'  // Default value for existing records
     },
     first_name: {
       type: DataTypes.STRING(50),
