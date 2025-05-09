@@ -4,7 +4,7 @@ COPY package*.json ./
 RUN npm install
 COPY . .
 
-RUN npm run build --prod && ls -la /app/dist
+RUN npm run build --configuration=production && ls -la /app/dist
 
 FROM nginx:alpine
 
